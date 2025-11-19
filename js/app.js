@@ -7,6 +7,8 @@ let markers = [];
 let globalPlaces = [];
 
 let favorites = new Set();
+let activeCategory = null;
+let activeRegion = null;
 
 /* DOM ELEMENTS */
 const sidebar = document.getElementById("sidebar");
@@ -58,15 +60,12 @@ function loadFavorites() {
   try {
     const saved = JSON.parse(localStorage.getItem("favorites") || "[]");
     favorites = new Set(saved);
-  } catch {
-    console.warn("Could not load favorites from localStorage");
-  }
+  } catch {}
 }
 
 function toggleFavorite(id) {
   if (favorites.has(id)) favorites.delete(id);
   else favorites.add(id);
-
   localStorage.setItem("favorites", JSON.stringify([...favorites]));
 }
 
@@ -172,18 +171,10 @@ function createMarkers(places) {
   markers = [];
 
   let added = 0;
-  let skipped = 0;
 
   places.forEach((place) => {
-    if (
-      typeof place.lat !== "number" ||
-      Number.isNaN(place.lat) ||
-      typeof place.lng !== "number" ||
-      Number.isNaN(place.lng)
-    ) {
-      skipped++;
-      return;
-    }
+    if (typeof place.lat !== "number" || isNaN(place.lat)) return;
+    if (typeof place.lng !== "number" || isNaN(place.lng)) return;
 
     const marker = L.marker([place.lat, place.lng], {
       icon: createMarkerIcon(place.category),
@@ -195,15 +186,63 @@ function createMarkers(places) {
     added++;
   });
 
-  console.log(`Markers created → added: ${added}, skipped: ${skipped}`);
-
   if (infoBar) {
     infoBar.textContent = `Loaded ${places.length} places • Showing ${added} markers`;
   }
 }
 
 /* ============================================================
-   FILTERS
+   FILTER BUTTON GENERATION
+============================================================ */
+function renderCategoryFilters(places) {
+  const container = document.getElementById("categoryFilters");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  const categories = [...new Set(places.map((p) => p.category).filter(Boolean))];
+
+  categories.forEach((cat) => {
+    const btn = document.createElement("button");
+    btn.className = "pill-button";
+    btn.dataset.category = cat;
+
+    btn.innerHTML = `${getCategoryEmoji(cat)} ${cat}`;
+
+    btn.addEventListener("click", () => {
+      activeCategory = activeCategory === cat ? null : cat;
+      applyFilters();
+    });
+
+    container.appendChild(btn);
+  });
+}
+
+function renderRegionFilters(places) {
+  const container = document.getElementById("regionFilters");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  const regions = [...new Set(places.map((p) => p.region).filter(Boolean))];
+
+  regions.forEach((r) => {
+    const btn = document.createElement("button");
+    btn.className = "pill-button pill-ghost";
+    btn.dataset.region = r;
+    btn.innerHTML = r;
+
+    btn.addEventListener("click", () => {
+      activeRegion = activeRegion === r ? null : r;
+      applyFilters();
+    });
+
+    container.appendChild(btn);
+  });
+}
+
+/* ============================================================
+   APPLY FILTERS
 ============================================================ */
 function applyFilters() {
   clusterGroup.clearLayers();
@@ -212,7 +251,9 @@ function applyFilters() {
     const place = globalPlaces.find((p) => p.id === m.placeId);
     if (!place) return;
 
-    // No filters yet — keep everything visible
+    if (activeCategory && place.category !== activeCategory) return;
+    if (activeRegion && place.region !== activeRegion) return;
+
     clusterGroup.addLayer(m);
   });
 }
@@ -240,7 +281,7 @@ function updateListView(places) {
     `;
 
     item.addEventListener("click", () => {
-      if (typeof p.lat === "number" && typeof p.lng === "number") {
+      if (!isNaN(p.lat) && !isNaN(p.lng)) {
         map.flyTo([p.lat, p.lng], 14, { duration: 0.6 });
       }
     });
@@ -256,24 +297,14 @@ async function loadPlaces() {
   try {
     if (infoBar) infoBar.textContent = "Loading places…";
 
-    const res = await fetch(
-      "https://puerto-rico-map.cobaya18.workers.dev/places"
-    );
+    const res = await fetch("https://puerto-rico-map.cobaya18.workers.dev/places");
     const data = await res.json();
 
-    console.log("Raw places from API:", data);
-
-    // Normalize + coerce types
     globalPlaces = (Array.isArray(data) ? data : []).map((p) => {
       const rawLat =
         p.lat ?? p.latitude ?? p.Latitude ?? p.LAT ?? p.geo_lat ?? null;
       const rawLng =
         p.lng ?? p.longitude ?? p.Longitude ?? p.LNG ?? p.geo_lng ?? null;
-
-      const latNum =
-        typeof rawLat === "number" ? rawLat : parseFloat(String(rawLat));
-      const lngNum =
-        typeof rawLng === "number" ? rawLng : parseFloat(String(rawLng));
 
       return {
         id: p.id || p.ID || p._id,
@@ -288,22 +319,19 @@ async function loadPlaces() {
           p.GoogleMaps ||
           p.google_maps_url ||
           "",
-
-        lat: latNum,
-        lng: lngNum,
+        lat: parseFloat(rawLat),
+        lng: parseFloat(rawLng),
       };
     });
 
-    console.log("Normalized places:", globalPlaces);
-
     loadFavorites();
+
+    renderCategoryFilters(globalPlaces);
+    renderRegionFilters(globalPlaces);
+
     updateListView(globalPlaces);
     createMarkers(globalPlaces);
     applyFilters();
-
-    if (infoBar && globalPlaces.length === 0) {
-      infoBar.textContent = "No places found.";
-    }
   } catch (err) {
     console.error("Error loading places:", err);
     if (infoBar) infoBar.textContent = "Error loading places.";
@@ -335,7 +363,7 @@ if (searchInput) {
       `;
 
       item.addEventListener("click", () => {
-        if (typeof r.lat === "number" && typeof r.lng === "number") {
+        if (!isNaN(r.lat) && !isNaN(r.lng)) {
           map.flyTo([r.lat, r.lng], 15);
         }
         searchResults.classList.remove("open");
@@ -350,12 +378,11 @@ if (searchInput) {
 
 /* ============================================================
    SERVICE WORKER
-   (Comment this out while debugging if caching is fighting you)
 ============================================================ */
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("service-worker.js")
-    .catch(() => console.warn("SW failed — continuing anyway."));
+    .catch(() => {});
 }
 
 /* ============================================================
