@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>MapMigo — Puerto Rico Map Guide</title>
+  <title>Puerto Rico Map Guide</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- PWA -->
+  <!-- PWA / Icons -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#ffffff">
-  
+  <meta name="theme-color" content="#f3f4f6">
+
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
   <!-- Leaflet CSS -->
   <link
@@ -29,10 +29,11 @@
     href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
   />
 
-  <!-- Your CSS -->
-  <link rel="stylesheet" href="css/styles.css">
+  <!-- ✅ All your previous CSS goes here now -->
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
+  <!-- Top bar with search + list button -->
   <div id="topBar">
     <button id="hamburgerButton" aria-label="Toggle filters">☰</button>
 
@@ -49,65 +50,52 @@
     <button id="openListView" aria-label="Open list view">List</button>
   </div>
 
+  <!-- Search results dropdown -->
   <div id="searchResults">
     <div class="search-results-header">Search results</div>
     <div id="searchResultsList"></div>
   </div>
 
+  <!-- Sidebar / filters -->
   <div id="sidebar">
     <div class="sidebar-handle"></div>
 
     <div class="sidebar-header">
       <div class="sidebar-header-title">Filters</div>
       <div class="sidebar-header-actions">
-        <button id="openSaved" class="pill-button">Saved</button>
-        <button id="resetFilters" class="pill-button pill-ghost">Reset</button>
+        <button id="openSavedView">Saved</button>
       </div>
     </div>
 
-    <div class="sidebar-section">
-      <div class="sidebar-section-title">View</div>
-      <div class="sidebar-row">
-        <button id="mapViewToggle" class="view-toggle active">Map</button>
-        <button id="listViewToggle" class="view-toggle">List</button>
-      </div>
+    <div id="infoBar">Loading places…</div>
+
+    <div class="filter-group">
+      <h4>Filter by Category</h4>
+      <div id="categoryButtons" class="filter-buttons"></div>
     </div>
 
-    <div class="sidebar-section">
-      <div class="sidebar-section-title">Categories</div>
-      <div id="categoryFilters" class="pill-row">
-        <!-- Filled dynamically -->
-      </div>
+    <div class="filter-group">
+      <h4>Filter by Region</h4>
+      <div id="regionButtons" class="filter-buttons"></div>
     </div>
 
-    <div class="sidebar-section">
-      <div class="sidebar-section-title">Regions</div>
-      <div id="regionFilters" class="pill-row">
-        <!-- Filled dynamically -->
-      </div>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-section-title">Info</div>
-      <div id="infoBar" class="info-bar">
-        Loading places…
-      </div>
+    <div class="filter-group filter-group-reset">
+      <button id="resetFiltersSidebar" class="reset-filters-btn">
+        Reset filters
+      </button>
     </div>
   </div>
 
-  <div id="layout">
-    <div id="map"></div>
-  </div>
+  <!-- Map container -->
+  <div id="map"></div>
 
-  <div id="mapStyleToggle" class="map-style-toggle">
-    <button id="mapStyleButton" class="map-style-button">
-      <span class="icon">🛰️</span>
-      <span class="label">Satellite</span>
-    </button>
-  </div>
-
-  <div id="mapStyleMenu" class="map-style-menu">
-    <button class="style-option" data-theme="Satellite">
+  <!-- Map style toggle -->
+  <button id="mapStyleToggle">
+    <span class="icon">🛰️</span>
+    <span>Map</span>
+  </button>
+  <div id="mapStyleMenu">
+    <button class="style-option active" data-theme="Satellite">
       <span class="icon">🛰️</span><span>Satellite</span>
     </button>
     <button class="style-option" data-theme="Dark">
@@ -118,8 +106,10 @@
     </button>
   </div>
 
+  <!-- GPS button -->
   <button id="gpsButton" title="Find my location">📍</button>
 
+  <!-- List view overlay -->
   <div id="listViewOverlay" class="closed">
     <div class="list-header">
       <div id="listHeaderTitle" class="list-header-title">Places list</div>
@@ -128,6 +118,7 @@
     <div id="listViewList"></div>
   </div>
 
+  <!-- Mobile place sheet -->
   <div id="placeSheet" class="place-sheet">
     <div class="sheet-handle"></div>
     <div class="place-sheet-inner">
@@ -147,9 +138,43 @@
     </div>
   </div>
 
-  <!-- Scripts -->
+  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+  <!-- ✅ All your main app logic goes into js/app.js -->
   <script src="js/app.js"></script>
+
+  <!-- Keep helper script for search results positioning inline (Option B) -->
+  <script>
+    function positionSearchResults() {
+      const bar = document.getElementById("searchBarWrapper");
+      const results = document.getElementById("searchResults");
+      if (!bar || !results) return;
+      const rect = bar.getBoundingClientRect();
+      results.style.left = rect.left + "px";
+      results.style.width = rect.width + "px";
+      results.style.top = (rect.bottom + 8) + "px";
+    }
+
+    window.addEventListener("resize", positionSearchResults);
+    window.addEventListener("DOMContentLoaded", positionSearchResults);
+  </script>
+
+  <!-- Keep service worker registration inline (Option B) -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker
+          .register("service-worker.js")
+          .then(function () {
+            console.log("Service Worker registered for Puerto Rico Map Guide");
+          })
+          .catch(function (err) {
+            console.warn("Service Worker registration failed:", err);
+          });
+      });
+    }
+  </script>
 </body>
 </html>
