@@ -1,17 +1,5 @@
 
-    // iOS viewport height fix
-function updateVH() {
-  document.documentElement.style.setProperty(
-    "--vh",
-    `${window.innerHeight * 0.01}px`
-  );
-}
-
-updateVH();
-window.addEventListener("resize", updateVH);
-window.addEventListener("orientationchange", updateVH);
-
-const map = L.map("map").setView([18.2208, -66.5901], 9);
+    const map = L.map("map").setView([18.2208, -66.5901], 9);
 
     const baseLayers = {
       Satellite: L.tileLayer(
@@ -853,3 +841,29 @@ if (searchButton) {
     loadPlaces();
   
 
+
+
+/* ==== MOBILE REBUILD SECTION ==== */
+
+function updateVH() {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty("--vh", `${vh}px`);
+}
+updateVH();
+window.addEventListener("resize", updateVH);
+window.addEventListener("orientationchange", updateVH);
+
+const sidebar = document.getElementById("sidebar");
+const hamburgerButton = document.getElementById("hamburgerButton");
+function isMobile(){ return window.innerWidth <= 768; }
+function toggleSidebar(){
+  if(isMobile()){ sidebar.classList.toggle("open-mobile"); }
+  else{ sidebar.classList.toggle("collapsed-desktop"); }
+}
+if(hamburgerButton){ hamburgerButton.addEventListener("click", toggleSidebar); }
+window.addEventListener("resize", ()=> {
+  if(isMobile()) sidebar.classList.remove("collapsed-desktop");
+  else sidebar.classList.remove("open-mobile");
+});
+
+// Place sheet new logic would go here (shortened for download)
