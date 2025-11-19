@@ -172,34 +172,34 @@ function buildPopup(place) {
 
   return `
     <div class="popup-content">
-      
+
       ${place.image_url ? `
         <div class="popup-image">
           <img src="${place.image_url}" alt="${place.title}">
         </div>
       ` : ""}
 
-      <div class="popup-title-row">
-        <div class="popup-title">${place.title || "Untitled place"}</div>
-        <button class="popup-fav-btn" data-id="${place.id}">
-          ${isFav ? "♥" : "♡"}
-        </button>
-      </div>
+      <div class="popup-title">${place.title || "Untitled place"}</div>
 
       <div class="popup-meta">
         ${getCategoryEmoji(place.category)} ${place.category || ""}
         ${place.region ? " • " + place.region : ""}
       </div>
 
-      ${
-        place.maps_url
-          ? `<div class="popup-link">
-               <a href="${place.maps_url}" target="_blank" rel="noopener">
-                 Open in Google Maps
-               </a>
-             </div>`
-          : ""
-      }
+      <div class="popup-buttons">
+        <button class="popup-pill popup-fav-btn" data-id="${place.id}">
+          ${isFav ? "♥ Saved" : "♡ Save"}
+        </button>
+
+        ${
+          place.maps_url
+            ? `<a class="popup-pill popup-map-btn" href="${place.maps_url}" target="_blank" rel="noopener">
+                 Open in Maps
+               </a>`
+            : ""
+        }
+      </div>
+
     </div>
   `;
 }
@@ -449,3 +449,4 @@ if ("serviceWorker" in navigator) {
 ============================================================ */
 initMap();
 loadPlaces();
+
