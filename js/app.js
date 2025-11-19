@@ -188,7 +188,7 @@ function applyFilters() {
   clusterGroup.clearLayers();
 
   markers.forEach(m => {
-    const place = globalPlaces.find(p => p.id === m.placeId);
+    const place = .find(p => p.id === m.placeId);
     if (!place) return;
 
     // No filters implemented here — everything shows
@@ -234,18 +234,18 @@ async function loadPlaces() {
 
     // 🔥 Normalize field names
     globalPlaces = data.map(p => ({
-      id: p.id || p.ID || p._id,
-      title: p.title || p.Title || "",
-      description: p.description || p.Description || "",
-      category: p.category || p.Category || "",
-      region: p.region || p.Region || "",
-      image_url: p.image_url || p.Image || p.ImageURL || "",
-      maps_url: p.maps_url || p.MapsURL || p.GoogleMaps || "",
+  id: p.id || p.ID || p._id,
+  title: p.title || p.Title || "",
+  description: p.description || p.Description || "",
+  category: p.category || p.Category || "",
+  region: p.region || p.Region || "",
+  image_url: p.image_url || p.Image || p.ImageURL || "",
+  maps_url: p.maps_url || p.MapsURL || p.GoogleMaps || "",
 
-      // Fix coordinates
-      lat: p.lat || p.latitude || p.Latitude || p.LAT || 0,
-      lng: p.lng || p.longitude || p.Longitude || p.LNG || 0,
-    }));
+  // 🔥 FIXED: Ensure coordinates are numeric!
+  lat: parseFloat(p.lat || p.latitude || p.Latitude || p.LAT),
+  lng: parseFloat(p.lng || p.longitude || p.Longitude || p.LNG),
+}));
 
     loadFavorites();
     updateListView(globalPlaces);
@@ -308,3 +308,4 @@ if ("serviceWorker" in navigator) {
 ============================================================ */
 initMap();
 loadPlaces();
+
