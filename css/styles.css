@@ -913,3 +913,61 @@ body {
   left: auto;
   right: 0.9rem;
 }
+
+/* === MOBILE FIXES – ensure sidebar, map, list view behave correctly === */
+@media (max-width: 768px) {
+  /* Map: full screen under the top bar */
+  #map {
+    position: fixed;
+    top: 3.1rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  /* Sidebar: bottom sheet, hidden by default */
+  #sidebar {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    width: auto;
+    max-width: none;
+    height: 55%;
+    border-radius: 1.1rem 1.1rem 0 0;
+    padding: 0.75rem 1rem 1rem;
+    box-shadow: 0 -16px 32px rgba(0, 0, 0, 0.45);
+    transform: translateY(100%);
+  }
+
+  /* When JS toggles "open-mobile", sheet slides up */
+  #sidebar.open-mobile {
+    transform: translateY(0);
+  }
+
+  /* On mobile, ignore the desktop-collapse transform */
+  #sidebar.collapsed-desktop {
+    transform: translateY(100%);
+  }
+
+  /* Show the little drag handle only on mobile */
+  .sidebar-handle {
+    display: block;
+  }
+
+  /* List view: full-width overlay on top of map */
+  #listViewOverlay {
+    left: 0;
+    right: 0;
+    top: 3.4rem;
+    bottom: 0;
+    width: auto;
+    border-radius: 0;
+    box-shadow: 0 0 0 transparent;
+  }
+
+  #listViewOverlay.closed {
+    display: none;
+  }
+}
+
