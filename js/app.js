@@ -6,20 +6,21 @@ let clusterGroup;
 let markers = [];
 let globalPlaces = [];
 
-let favorites = new Set();
-let activeCategory = null;
-let activeRegion = null;
+// MULTI-SELECT FILTERS
+let activeCategories = [];
+let activeRegions = [];
 
-/* DOM ELEMENTS */
+let favorites = new Set();
+
+/* DOM */
 const sidebar = document.getElementById("sidebar");
-const listViewOverlay = document.getElementById("listViewOverlay");
 const searchInput = document.getElementById("search");
 const searchResults = document.getElementById("searchResults");
 const searchResultsList = document.getElementById("searchResultsList");
 const infoBar = document.getElementById("infoBar");
 
 /* ============================================================
-   INITIALIZE MAP
+   MAP INIT
 ============================================================ */
 function initMap() {
   map = L.map("map", {
@@ -47,7 +48,7 @@ function initMap() {
 
   clusterGroup = L.markerClusterGroup({
     showCoverageOnHover: false,
-    maxClusterRadius: 48,
+    maxClusterRadius: 45,
   });
 
   map.addLayer(clusterGroup);
@@ -58,20 +59,20 @@ function initMap() {
 ============================================================ */
 function loadFavorites() {
   try {
-    const saved = JSON.parse(localStorage.getItem("favorites") || "[]");
-    favorites = new Set(saved);
+    favorites = new Set(
+      JSON.parse(localStorage.getItem("favorites") || "[]")
+    );
   } catch {}
 }
 
 function toggleFavorite(id) {
   if (favorites.has(id)) favorites.delete(id);
   else favorites.add(id);
-
   localStorage.setItem("favorites", JSON.stringify([...favorites]));
 }
 
 /* ============================================================
-   CATEGORY EMOJIS + COLORS
+   CATEGORY COLORS / EMOJIS
 ============================================================ */
 const categoryEmojiMap = {
   Beach: "🏖️",
@@ -92,80 +93,31 @@ const categoryEmojiMap = {
 function getCategoryEmoji(c = "") {
   if (!c) return "📍";
   if (categoryEmojiMap[c]) return categoryEmojiMap[c];
-
-  const lc = c.toLowerCase();
-  if (lc.includes("beach")) return "🏖️";
-  if (lc.includes("night")) return "🎵";
-  if (lc.includes("food")) return "🍽️";
-  if (lc.includes("park") || lc.includes("nature")) return "🌳";
-  if (lc.includes("hike")) return "🥾";
-  if (lc.includes("view")) return "📸";
-  if (lc.includes("museum")) return "🏛️";
-  if (lc.includes("historic")) return "🏰";
-  if (lc.includes("water") || lc.includes("river") || lc.includes("falls"))
-    return "🏞️";
-  if (lc.includes("shop")) return "🛍️";
-  if (lc.includes("tour")) return "🧭";
   return "📍";
 }
 
 function getCategoryColor(c = "") {
-  const byExact = {
-    Beach: "#00C8FF",
-    Entertainment: "#FF0080",
-    Food: "#FF6B00",
-    Hiking: "#2DD4BF",
-    "Historical Landmark": "#8B5CF6",
-    Museum: "#3F51B5",
-    Nightlife: "#FF1493",
-    "Park/Nature": "#4CAF50",
-    "Point of Interest": "#FFD400",
-    "River/Waterfall": "#0096C7",
-    Shopping: "#FFB703",
-    "Tour/Activity": "#3B82F6",
-    Viewpoint: "#E11D48",
-  };
-
-  if (byExact[c]) return byExact[c];
-
-  const lc = c.toLowerCase();
-  if (lc.includes("beach")) return "#00C8FF";
-  if (lc.includes("night")) return "#FF1493";
-  if (lc.includes("food")) return "#FF6B00";
-  if (lc.includes("park")) return "#4CAF50";
-  if (lc.includes("hike")) return "#2DD4BF";
-  if (lc.includes("view")) return "#E11D48";
-  if (lc.includes("museum")) return "#3F51B5";
-  if (lc.includes("historic")) return "#8B5CF6";
-  if (lc.includes("water")) return "#0096C7";
-  if (lc.includes("shop")) return "#FFB703";
-  if (lc.includes("tour")) return "#3B82F6";
-
-  return "#3B82F6";
+  return "#3B82F6"; // default
 }
 
 /* ============================================================
    MARKER ICON
 ============================================================ */
 function createMarkerIcon(category) {
-  const emoji = getCategoryEmoji(category);
-  const color = getCategoryColor(category);
-
   return L.divIcon({
     className: "custom-marker",
     html: `
-      <div class="marker-pin" style="background:${color}">
-        <span class="marker-emoji" style="font-size:14px;">${emoji}</span>
+      <div class="marker-pin" style="background:${getCategoryColor(category)}">
+        <span class="marker-emoji">${getCategoryEmoji(category)}</span>
       </div>
     `,
     iconSize: [32, 32],
     iconAnchor: [16, 32],
-    popupAnchor: [0, -30],
   });
 }
 
 /* ============================================================
-   POPUP CONTENT (WITH IMAGE + FAVORITES)
+   POPUP BUILDER
 ============================================================ */
 function buildPopup(place) {
   const isFav = favorites.has(place.id);
@@ -175,14 +127,13 @@ function buildPopup(place) {
 
       ${place.image_url ? `
         <div class="popup-image">
-          <img src="${place.image_url}" alt="${place.title}">
-        </div>
-      ` : ""}
+          <img src="${place.image_url}" alt="">
+        </div>` : ""}
 
-      <div class="popup-title">${place.title || "Untitled place"}</div>
+      <div class="popup-title">${place.title}</div>
 
       <div class="popup-meta">
-        ${getCategoryEmoji(place.category)} ${place.category || ""}
+        ${getCategoryEmoji(place.category)} ${place.category}
         ${place.region ? " • " + place.region : ""}
       </div>
 
@@ -193,13 +144,12 @@ function buildPopup(place) {
 
         ${
           place.maps_url
-            ? `<a class="popup-pill popup-map-btn" href="${place.maps_url}" target="_blank" rel="noopener">
-                 Open in Maps
-               </a>`
+            ? `<a class="popup-pill popup-map-btn" target="_blank" href="${place.maps_url}">
+                Open in Maps
+              </a>`
             : ""
         }
       </div>
-
     </div>
   `;
 }
@@ -211,65 +161,63 @@ function createMarkers(places) {
   clusterGroup.clearLayers();
   markers = [];
 
-  let added = 0;
+  let count = 0;
 
-  places.forEach((place) => {
-    if (typeof place.lat !== "number" || isNaN(place.lat)) return;
-    if (typeof place.lng !== "number" || isNaN(place.lng)) return;
+  places.forEach(place => {
+    if (isNaN(place.lat) || isNaN(place.lng)) return;
 
     const marker = L.marker([place.lat, place.lng], {
       icon: createMarkerIcon(place.category),
     });
 
     marker.placeId = place.id;
+    marker.bindPopup(buildPopup(place));
 
-    // Bind popup
-    const popupHtml = buildPopup(place);
-    marker.bindPopup(popupHtml);
-
-    // Favorite toggle inside popup
     marker.on("popupopen", () => {
       const btn = document.querySelector(
         `.popup-fav-btn[data-id='${place.id}']`
       );
-      if (!btn) return;
-
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        toggleFavorite(place.id);
-        btn.textContent = favorites.has(place.id) ? "♥" : "♡";
-      });
+      if (btn) {
+        btn.addEventListener("click", e => {
+          e.stopPropagation();
+          toggleFavorite(place.id);
+          btn.textContent = favorites.has(place.id)
+            ? "♥ Saved"
+            : "♡ Save";
+        });
+      }
     });
 
-    markers.push(marker);
     clusterGroup.addLayer(marker);
-    added++;
+    markers.push(marker);
+    count++;
   });
 
-  if (infoBar) {
-    infoBar.textContent = `Loaded ${places.length} places • Showing ${added} markers`;
-  }
+  infoBar.textContent = `Loaded ${places.length} places • Showing ${count}`;
 }
 
 /* ============================================================
-   FILTER BUTTON GENERATION
+   FILTER BUTTON RENDERING (MULTI-SELECT)
 ============================================================ */
 function renderCategoryFilters(places) {
   const container = document.getElementById("categoryFilters");
-  if (!container) return;
-
   container.innerHTML = "";
 
-  const categories = [...new Set(places.map((p) => p.category).filter(Boolean))];
+  const categories = [...new Set(places.map(p => p.category).filter(Boolean))];
 
-  categories.forEach((cat) => {
+  categories.forEach(cat => {
     const btn = document.createElement("button");
     btn.className = "pill-button";
-    btn.dataset.category = cat;
-    btn.innerHTML = `${getCategoryEmoji(cat)} ${cat}`;
+    btn.textContent = `${getCategoryEmoji(cat)} ${cat}`;
 
     btn.addEventListener("click", () => {
-      activeCategory = activeCategory === cat ? null : cat;
+      if (activeCategories.includes(cat)) {
+        activeCategories = activeCategories.filter(c => c !== cat);
+        btn.classList.remove("active");
+      } else {
+        activeCategories.push(cat);
+        btn.classList.add("active");
+      }
       applyFilters();
     });
 
@@ -279,20 +227,23 @@ function renderCategoryFilters(places) {
 
 function renderRegionFilters(places) {
   const container = document.getElementById("regionFilters");
-  if (!container) return;
-
   container.innerHTML = "";
 
-  const regions = [...new Set(places.map((p) => p.region).filter(Boolean))];
+  const regions = [...new Set(places.map(p => p.region).filter(Boolean))];
 
-  regions.forEach((r) => {
+  regions.forEach(r => {
     const btn = document.createElement("button");
     btn.className = "pill-button pill-ghost";
-    btn.dataset.region = r;
-    btn.innerHTML = r;
+    btn.textContent = r;
 
     btn.addEventListener("click", () => {
-      activeRegion = activeRegion === r ? null : r;
+      if (activeRegions.includes(r)) {
+        activeRegions = activeRegions.filter(x => x !== r);
+        btn.classList.remove("active");
+      } else {
+        activeRegions.push(r);
+        btn.classList.add("active");
+      }
       applyFilters();
     });
 
@@ -301,100 +252,76 @@ function renderRegionFilters(places) {
 }
 
 /* ============================================================
-   APPLY FILTERS
+   APPLY FILTERS (MULTI-SELECT)
 ============================================================ */
 function applyFilters() {
   clusterGroup.clearLayers();
 
-  markers.forEach((m) => {
-    const place = globalPlaces.find((p) => p.id === m.placeId);
-    if (!place) return;
+  const visible = globalPlaces.filter(p => {
+    if (activeCategories.length > 0 &&
+        !activeCategories.includes(p.category)) return false;
 
-    if (activeCategory && place.category !== activeCategory) return;
-    if (activeRegion && place.region !== activeRegion) return;
+    if (activeRegions.length > 0 &&
+        !activeRegions.includes(p.region)) return false;
 
-    clusterGroup.addLayer(m);
+    return true;
   });
+
+  createMarkers(visible);
 }
 
 /* ============================================================
-   LIST VIEW
+   LIST VIEW UPDATE
 ============================================================ */
 function updateListView(places) {
   const list = document.getElementById("listViewList");
-  if (!list) return;
-
   list.innerHTML = "";
 
-  places.forEach((p) => {
+  places.forEach(p => {
     const item = document.createElement("div");
     item.className = "list-item";
     item.innerHTML = `
-      <div class="list-thumb"><img src="${p.image_url || ""}" alt="" /></div>
+      <div class="list-thumb">
+        <img src="${p.image_url || ""}">
+      </div>
       <div class="list-details">
-        <div class="list-title-row">
-          <div class="list-title">${p.title}</div>
-        </div>
-        <div class="list-meta">${p.category || ""} • ${p.region || ""}</div>
+        <div class="list-title">${p.title}</div>
+        <div class="list-meta">${p.category} • ${p.region}</div>
       </div>
     `;
-
     item.addEventListener("click", () => {
-      if (!isNaN(p.lat) && !isNaN(p.lng)) {
-        map.flyTo([p.lat, p.lng], 14, { duration: 0.6 });
-      }
+      if (!isNaN(p.lat)) map.flyTo([p.lat, p.lng], 15);
     });
-
     list.appendChild(item);
   });
 }
 
 /* ============================================================
-   DATA LOADING
+   LOAD PLACES
 ============================================================ */
 async function loadPlaces() {
-  try {
-    if (infoBar) infoBar.textContent = "Loading places…";
+  const res = await fetch(
+    "https://puerto-rico-map.cobaya18.workers.dev/places"
+  );
+  const data = await res.json();
 
-    const res = await fetch("https://puerto-rico-map.cobaya18.workers.dev/places");
-    const data = await res.json();
+  globalPlaces = data.map(p => ({
+    id: p.id,
+    title: p.title,
+    category: p.category,
+    region: p.region,
+    image_url: p.image_url,
+    maps_url: p.maps_url || p.google_maps_url || "",
+    lat: parseFloat(p.latitude),
+    lng: parseFloat(p.longitude),
+    description: p.description || "",
+  }));
 
-    globalPlaces = (Array.isArray(data) ? data : []).map((p) => {
-      const rawLat =
-        p.lat ?? p.latitude ?? p.Latitude ?? p.LAT ?? p.geo_lat ?? null;
-      const rawLng =
-        p.lng ?? p.longitude ?? p.Longitude ?? p.LNG ?? p.geo_lng ?? null;
-
-      return {
-        id: p.id || p.ID || p._id,
-        title: p.title || p.Title || "",
-        description: p.description || p.Description || "",
-        category: p.category || p.Category || "",
-        region: p.region || p.Region || "",
-        image_url: p.image_url || p.Image || p.ImageURL || "",
-        maps_url:
-          p.maps_url ||
-          p.MapsURL ||
-          p.GoogleMaps ||
-          p.google_maps_url ||
-          "",
-        lat: parseFloat(rawLat),
-        lng: parseFloat(rawLng),
-      };
-    });
-
-    loadFavorites();
-
-    renderCategoryFilters(globalPlaces);
-    renderRegionFilters(globalPlaces);
-
-    updateListView(globalPlaces);
-    createMarkers(globalPlaces);
-    applyFilters();
-  } catch (err) {
-    console.error("Error loading places:", err);
-    if (infoBar) infoBar.textContent = "Error loading places.";
-  }
+  loadFavorites();
+  renderCategoryFilters(globalPlaces);
+  renderRegionFilters(globalPlaces);
+  updateListView(globalPlaces);
+  createMarkers(globalPlaces);
 }
 
 /* ============================================================
@@ -402,32 +329,29 @@ async function loadPlaces() {
 ============================================================ */
 if (searchInput) {
   searchInput.addEventListener("input", () => {
-    const q = searchInput.value.trim().toLowerCase();
+    const q = searchInput.value.toLowerCase();
+
     if (!q) {
       searchResults.classList.remove("open");
       return;
     }
 
-    const results = globalPlaces.filter((p) =>
-      (p.title || "").toLowerCase().includes(q)
+    const results = globalPlaces.filter(p =>
+      p.title.toLowerCase().includes(q)
     );
 
     searchResultsList.innerHTML = "";
-    results.forEach((r) => {
+    results.forEach(r => {
       const item = document.createElement("div");
       item.className = "search-result-item";
       item.innerHTML = `
         <div class="search-result-title">${r.title}</div>
-        <div class="search-result-meta">${r.category || ""}</div>
+        <div class="search-result-meta">${r.category}</div>
       `;
-
       item.addEventListener("click", () => {
-        if (!isNaN(r.lat) && !isNaN(r.lng)) {
-          map.flyTo([r.lat, r.lng], 15);
-        }
+        map.flyTo([r.lat, r.lng], 15);
         searchResults.classList.remove("open");
       });
-
       searchResultsList.appendChild(item);
     });
 
@@ -436,17 +360,21 @@ if (searchInput) {
 }
 
 /* ============================================================
-   SERVICE WORKER
+   RESET FILTERS
 ============================================================ */
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker
-    .register("service-worker.js")
-    .catch(() => {});
-}
+document.getElementById("resetFilters").addEventListener("click", () => {
+  activeCategories = [];
+  activeRegions = [];
+
+  document
+    .querySelectorAll("#categoryFilters .pill-button, #regionFilters .pill-button")
+    .forEach(btn => btn.classList.remove("active"));
+
+  applyFilters();
+});
 
 /* ============================================================
-   START
+   INIT
 ============================================================ */
 initMap();
 loadPlaces();
-
