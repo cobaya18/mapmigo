@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Puerto Rico Map Guide</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#f3f4f6">
+
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <!-- MarkerCluster CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+  />
+
+  <!-- Your main stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+
+</head>
+<body>
+  <div id="topBar">
+    <button id="hamburgerButton" aria-label="Toggle filters">☰</button>
+
+    <div id="searchBarWrapper">
+      <input
+        id="search"
+        placeholder="Search places…"
+        aria-label="Search places"
+      />
+      <button id="searchClear" aria-label="Clear search">✕</button>
+      <button id="searchButton" aria-label="Search">🔍</button>
+    </div>
+
+    <button id="openListView" aria-label="Open list view">List</button>
+  </div>
+
+  <div id="searchResults">
+    <div class="search-results-header">Search results</div>
+    <div id="searchResultsList"></div>
+  </div>
+
+  <div id="sidebar">
+    <div class="sidebar-handle"></div>
+
+    <div class="sidebar-header">
+      <div class="sidebar-header-title">Filters</div>
+      <div class="sidebar-header-actions">
+        <button id="openSaved" class="pill-button">Saved</button>
+        <button id="resetFilters" class="pill-button pill-ghost">Reset</button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">View</div>
+      <div class="sidebar-row">
+        <button id="mapViewToggle" class="view-toggle active">Map</button>
+        <button id="listViewToggle" class="view-toggle">List</button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Categories</div>
+      <div id="categoryFilters" class="pill-row">
+        <!-- Filled dynamically -->
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Regions</div>
+      <div id="regionFilters" class="pill-row">
+        <!-- Filled dynamically -->
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Info</div>
+      <div id="infoBar" class="info-bar">
+        Loading places…
+      </div>
+    </div>
+  </div>
+
+  <div id="layout">
+    <div id="map"></div>
+  </div>
+
+  <div id="mapStyleToggle" class="map-style-toggle">
+    <button id="mapStyleButton" class="map-style-button">
+      <span class="icon">🛰️</span>
+      <span class="label">Satellite</span>
+    </button>
+  </div>
+
+  <div id="mapStyleMenu" class="map-style-menu">
+    <button class="style-option" data-theme="Satellite">
+      <span class="icon">🛰️</span><span>Satellite</span>
+    </button>
+    <button class="style-option" data-theme="Dark">
+      <span class="icon">⬛</span><span>Dark</span>
+    </button>
+    <button class="style-option" data-theme="Light">
+      <span class="icon">◻️</span><span>Light</span>
+    </button>
+  </div>
+
+  <button id="gpsButton" title="Find my location">📍</button>
+
+  <div id="listViewOverlay" class="closed">
+    <div class="list-header">
+      <div id="listHeaderTitle" class="list-header-title">Places list</div>
+      <button id="closeListView">Close</button>
+    </div>
+    <div id="listViewList"></div>
+  </div>
+
+  <div id="placeSheet" class="place-sheet">
+    <div class="sheet-handle"></div>
+    <div class="place-sheet-inner">
+      <div id="sheetPreview">
+        <div class="sheet-title-row">
+          <div id="sheetTitle"></div>
+          <button id="sheetFavBtn">♡</button>
+        </div>
+        <div id="sheetMeta"></div>
+        <button id="sheetExpand">Expand</button>
+      </div>
+      <div id="sheetDetails">
+        <img id="sheetImage" alt="" />
+        <p id="sheetDescription"></p>
+        <a id="sheetMapsBtn" target="_blank" href="#">Open in Google Maps</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
