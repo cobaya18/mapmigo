@@ -92,18 +92,19 @@ export function initMarkers() {
         marker.openPopup();
       });
 
-      // Apply favorite-click inside popup
+      // FIXED FAVORITE BUTTON HANDLER
       marker.on("popupopen", (e) => {
-        const popupNode = e.popup._contentNode;
-        const favBtn = popupNode.querySelector(".fav-btn");
+        const popupNode = e.popup.getElement(); // FIXED: live DOM each open
+        if (!popupNode) return;
 
-        if (favBtn) {
-          favBtn.onclick = (evt) => {
-            evt.stopPropagation();
-            toggleFavorite(key);
-            favBtn.classList.toggle("fav-active", isFavorite(key));
-          };
-        }
+        const favBtn = popupNode.querySelector(".fav-btn");
+        if (!favBtn) return;
+
+        favBtn.addEventListener("click", (evt) => {
+          evt.stopPropagation();
+          toggleFavorite(key);
+          favBtn.classList.toggle("fav-active", isFavorite(key));
+        });
       });
     }
 
