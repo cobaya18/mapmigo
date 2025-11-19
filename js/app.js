@@ -180,7 +180,31 @@ function createMarkers(places) {
       icon: createMarkerIcon(place.category),
     });
 
+    // 🧷 Store ID
     marker.placeId = place.id;
+
+    // 🗨️ Bind a Leaflet popup
+    const popupHtml = `
+      <div class="popup-content">
+        <div class="popup-title">${place.title || "Untitled place"}</div>
+        <div class="popup-meta">
+          ${getCategoryEmoji(place.category)} ${place.category || ""} 
+          ${place.region ? " • " + place.region : ""}
+        </div>
+        ${
+          place.maps_url
+            ? `<div class="popup-link">
+                 <a href="${place.maps_url}" target="_blank" rel="noopener">
+                   Open in Google Maps
+                 </a>
+               </div>`
+            : ""
+        }
+      </div>
+    `;
+
+    marker.bindPopup(popupHtml);
+
     markers.push(marker);
     clusterGroup.addLayer(marker);
     added++;
@@ -390,3 +414,4 @@ if ("serviceWorker" in navigator) {
 ============================================================ */
 initMap();
 loadPlaces();
+
