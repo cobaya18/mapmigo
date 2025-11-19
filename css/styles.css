@@ -971,3 +971,28 @@ body {
   }
 }
 
+/* ===========================================
+   FIX iOS SAFARI LAYOUT ISSUES
+   Ensures #map fills the viewport correctly
+   =========================================== */
+
+:root {
+  /* iOS-safe dynamic viewport height */
+  --vh: 1vh;
+}
+
+/* Update the variable based on JS on mobile */
+body {
+  height: calc(var(--vh, 1vh) * 100);
+}
+
+/* Force map to size properly using the JS-updated vh */
+#map {
+  position: fixed;
+  top: 3.2rem;
+  left: 0;
+  right: 0;
+  height: calc(var(--vh, 1vh) * 100);
+  bottom: 0;
+}
+
