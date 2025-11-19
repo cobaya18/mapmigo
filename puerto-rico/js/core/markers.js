@@ -85,16 +85,17 @@ export function initMarkers() {
        DESKTOP MODE — popups work normally
     ============================================================ */
     if (!isMobile()) {
-      marker.bindPopup(popupHtml);
+      // IMPORTANT FIX: disable sanitization so Leaflet does not strip the heart icon
+      marker.bindPopup(popupHtml, { sanitize: false });
 
       marker.on("click", () => {
         highlightMarker(marker);
         marker.openPopup();
       });
 
-      // FIXED FAVORITE BUTTON HANDLER
+      // Favorite button logic — always runs with fresh DOM
       marker.on("popupopen", (e) => {
-        const popupNode = e.popup.getElement(); // FIXED: live DOM each open
+        const popupNode = e.popup.getElement();
         if (!popupNode) return;
 
         const favBtn = popupNode.querySelector(".fav-btn");
