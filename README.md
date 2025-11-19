@@ -1,2 +1,2 @@
 # mapmigo
-Site source code
+Site source code for mapmigo.app
