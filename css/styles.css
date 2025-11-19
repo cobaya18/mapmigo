@@ -742,13 +742,3 @@ html, body {
   100% { background-position: -200% 0; }
 }
 
-@media (min-width: 769px) {
-  #searchBarWrapper {
-    width: 320px;        /* same width as sidebar */
-    max-width: 320px;
-    margin-left: 0;      /* aligns it with sidebar */
-    border-bottom-left-radius: 0;   /* connects visually */
-    border-bottom-right-radius: 0;
-  }
-}
-
