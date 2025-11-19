@@ -7,11 +7,12 @@ let highlightRing = null;
 
 export function initMarkers() {
   if (!state.map) throw new Error("Map not initialized");
-  if (!Array.isArray(state.places)) state.places = [];
+
+  const isMobile = () => window.innerWidth <= 768;
 
   const clusterGroup = L.markerClusterGroup({
     showCoverageOnHover: false,
-    zoomToBoundsOnClick: true,
+    zoomToBoundsOnClick: !isMobile(),   // mobile = no zoomToBounds popup
     spiderfyOnEveryClick: true,
     animateAddingMarkers: true,
     disableClusteringAtZoom: 10,
@@ -19,10 +20,18 @@ export function initMarkers() {
     spiderfyDistanceMultiplier: 1.4,
   });
 
-  state.markers = [];
-  state.clusterGroup = clusterGroup;
+  // Mobile: Prevent ANY popup from cluster clicks
+  if (isMobile()) {
+    clusterGroup.on("clusterclick", function (e) {
+      // Just spiderfy — do NOT open popups
+      e.layer.spiderfy();
+      e.originalEvent.preventDefault();
+      e.originalEvent.stopPropagation();
+    });
+  }
 
-  const isMobile = () => window.innerWidth <= 768;
+  state.clusterGroup = clusterGroup;
+  state.markers = [];
 
   state.places.forEach((p, index) => {
     const lat = Number(p.latitude);
@@ -42,17 +51,18 @@ export function initMarkers() {
 
     const popupHtml = buildPopupHtml(p, key, url);
 
-    // DESKTOP ONLY: bind popup
+    /* =====================================================
+       DESKTOP BEHAVIOR — Normal Popups
+    ===================================================== */
     if (!isMobile()) {
       marker.bindPopup(popupHtml);
 
-      // Desktop click → open popup
       marker.on("click", () => {
         highlightMarker(marker);
         marker.openPopup();
       });
 
-      // Attach favorite button in popup
+      // Add favorite button behavior inside popup
       marker.on("popupopen", (e) => {
         const popupNode = e.popup._contentNode;
         const favBtn = popupNode.querySelector(".fav-btn");
@@ -61,17 +71,21 @@ export function initMarkers() {
             evt.stopPropagation();
             const k = favBtn.dataset.key;
             toggleFavorite(k);
-            if (isFavorite(k)) favBtn.classList.add("fav-active");
-            else favBtn.classList.remove("fav-active");
+            favBtn.classList.toggle("fav-active", isFavorite(k));
           };
         }
       });
 
     } else {
-      // MOBILE ONLY: disable popups completely
-      marker.unbindPopup();
 
-      // Mobile click → open bottom-sheet
+      /* =====================================================
+         MOBILE BEHAVIOR — NO POPUPS AT ALL
+      ===================================================== */
+
+      marker.unbindPopup();      // remove popup binding
+      marker.off("popupopen");   // remove popup-trigger event
+      marker.closePopup();       // ensure popups never appear
+
       marker.on("click", () => {
         highlightMarker(marker);
 
@@ -80,34 +94,37 @@ export function initMarkers() {
         });
         window.dispatchEvent(evt);
       });
-
-      // Prevent long press or weird popup events
-      marker.on("popupopen", () => marker.closePopup());
     }
 
-    // Marker selection effect (desktop + mobile)
+    // Visual highlight for both desktop + mobile
     marker.on("click", () => {
       document
         .querySelectorAll(".marker-pin")
-        .forEach((pEl) => pEl.classList.remove("marker-pin-selected"));
+        .forEach((el) => el.classList.remove("marker-pin-selected"));
 
-      const el = marker._icon;
-      if (el) {
-        const pin = el.querySelector(".marker-pin");
-        if (pin) pin.classList.add("marker-pin-selected");
-      }
+      const pin = marker._icon?.querySelector(".marker-pin");
+      if (pin) pin.classList.add("marker-pin-selected");
     });
 
     clusterGroup.addLayer(marker);
     state.markers.push(marker);
   });
 
+  /* =====================================================
+     Mobile — GLOBAL popup prevention
+  ===================================================== */
+  if (isMobile()) {
+    state.map.on("popupopen", (e) => {
+      e.popup._close();
+    });
+  }
+
   state.map.addLayer(clusterGroup);
 }
 
-/* =====================================================================
-   MARKER ICON
-===================================================================== */
+/* =====================================================
+   ICON BUILDER
+===================================================== */
 function createMarkerIcon(category) {
   const color = getCategoryColor(category);
   const emoji = getCategoryEmoji(category);
@@ -125,9 +142,9 @@ function createMarkerIcon(category) {
   });
 }
 
-/* =====================================================================
-   POPUP HTML (Desktop Only)
-===================================================================== */
+/* =====================================================
+   POPUP BUILDER (Desktop ONLY)
+===================================================== */
 function buildPopupHtml(place, key, url) {
   let html = "<div class='popup-card'>";
 
@@ -165,9 +182,9 @@ function buildPopupHtml(place, key, url) {
   return html;
 }
 
-/* =====================================================================
-   HIGHLIGHT EFFECT (Desktop + Mobile)
-===================================================================== */
+/* =====================================================
+   MARKER HIGHLIGHT ANIMATION
+===================================================== */
 export function highlightMarker(marker) {
   if (!marker || !state.map) return;
 
@@ -185,7 +202,7 @@ export function highlightMarker(marker) {
   }).addTo(state.map);
 
   setTimeout(() => {
-    if (highlightRing && state.map) {
+    if (highlightRing) {
       state.map.removeLayer(highlightRing);
       highlightRing = null;
     }
