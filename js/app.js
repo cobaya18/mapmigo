@@ -1,5 +1,17 @@
 
-    const map = L.map("map").setView([18.2208, -66.5901], 9);
+    // iOS viewport height fix
+function updateVH() {
+  document.documentElement.style.setProperty(
+    "--vh",
+    `${window.innerHeight * 0.01}px`
+  );
+}
+
+updateVH();
+window.addEventListener("resize", updateVH);
+window.addEventListener("orientationchange", updateVH);
+
+const map = L.map("map").setView([18.2208, -66.5901], 9);
 
     const baseLayers = {
       Satellite: L.tileLayer(
@@ -840,3 +852,4 @@ if (searchButton) {
 
     loadPlaces();
   
+
