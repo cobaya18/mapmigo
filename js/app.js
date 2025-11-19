@@ -66,6 +66,7 @@ function loadFavorites() {
 function toggleFavorite(id) {
   if (favorites.has(id)) favorites.delete(id);
   else favorites.add(id);
+
   localStorage.setItem("favorites", JSON.stringify([...favorites]));
 }
 
@@ -164,6 +165,46 @@ function createMarkerIcon(category) {
 }
 
 /* ============================================================
+   POPUP CONTENT (WITH IMAGE + FAVORITES)
+============================================================ */
+function buildPopup(place) {
+  const isFav = favorites.has(place.id);
+
+  return `
+    <div class="popup-content">
+      
+      ${place.image_url ? `
+        <div class="popup-image">
+          <img src="${place.image_url}" alt="${place.title}">
+        </div>
+      ` : ""}
+
+      <div class="popup-title-row">
+        <div class="popup-title">${place.title || "Untitled place"}</div>
+        <button class="popup-fav-btn" data-id="${place.id}">
+          ${isFav ? "♥" : "♡"}
+        </button>
+      </div>
+
+      <div class="popup-meta">
+        ${getCategoryEmoji(place.category)} ${place.category || ""}
+        ${place.region ? " • " + place.region : ""}
+      </div>
+
+      ${
+        place.maps_url
+          ? `<div class="popup-link">
+               <a href="${place.maps_url}" target="_blank" rel="noopener">
+                 Open in Google Maps
+               </a>
+             </div>`
+          : ""
+      }
+    </div>
+  `;
+}
+
+/* ============================================================
    CREATE MARKERS
 ============================================================ */
 function createMarkers(places) {
@@ -180,45 +221,35 @@ function createMarkers(places) {
       icon: createMarkerIcon(place.category),
     });
 
-    // 🧷 Store ID
     marker.placeId = place.id;
 
-    // 🗨️ Bind a Leaflet popup
-    // 🗨️ Build popup HTML
-const isFav = favorites.has(place.id);
-const popupHtml = `
-  <div class="popup-content">
-    
-    ${place.image_url 
-      ? `<div class="popup-image">
-           <img src="${place.image_url}" alt="${place.title}">
-         </div>`
-      : ""
-    }
+    // Bind popup
+    const popupHtml = buildPopup(place);
+    marker.bindPopup(popupHtml);
 
-    <div class="popup-title-row">
-      <div class="popup-title">${place.title || "Untitled place"}</div>
-      <button class="popup-fav-btn" data-id="${place.id}">
-        ${isFav ? "♥" : "♡"}
-      </button>
-    </div>
+    // Favorite toggle inside popup
+    marker.on("popupopen", () => {
+      const btn = document.querySelector(
+        `.popup-fav-btn[data-id='${place.id}']`
+      );
+      if (!btn) return;
 
-    <div class="popup-meta">
-      ${getCategoryEmoji(place.category)} ${place.category || ""}
-      ${place.region ? " • " + place.region : ""}
-    </div>
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleFavorite(place.id);
+        btn.textContent = favorites.has(place.id) ? "♥" : "♡";
+      });
+    });
 
-    ${
-      place.maps_url
-        ? `<div class="popup-link">
-             <a href="${place.maps_url}" target="_blank" rel="noopener">
-               Open in Google Maps
-             </a>
-           </div>`
-        : ""
-    }
-  </div>
-`;
+    markers.push(marker);
+    clusterGroup.addLayer(marker);
+    added++;
+  });
+
+  if (infoBar) {
+    infoBar.textContent = `Loaded ${places.length} places • Showing ${added} markers`;
+  }
+}
 
 /* ============================================================
    FILTER BUTTON GENERATION
@@ -235,7 +266,6 @@ function renderCategoryFilters(places) {
     const btn = document.createElement("button");
     btn.className = "pill-button";
     btn.dataset.category = cat;
-
     btn.innerHTML = `${getCategoryEmoji(cat)} ${cat}`;
 
     btn.addEventListener("click", () => {
@@ -419,5 +449,3 @@ if ("serviceWorker" in navigator) {
 ============================================================ */
 initMap();
 loadPlaces();
-
-
