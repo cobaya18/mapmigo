@@ -100,29 +100,26 @@ function toggleFavorite(key) {
   saveFavorites();
 }
 
-function getCategoryColor(c) {
-  if (!c) return "#3B82F6";
+function getCategoryColor(c = "") {
   const byExact = {
-    Beach: "#00C8FF",
-    "Beach Bar": "#00C8FF",
-    "Bar": "#FF0080",
-    "Bar / Lounge": "#FF0080",
-    "Café": "#FF6B00",
-    "Coffee": "#FF6B00",
-    "Food & Drink": "#FF6B00",
-    "Restaurant": "#FF6B00",
+    "Beach": "#00C8FF",
+    "Entertainment": "#FF0080",
+    "Food": "#FF6B00",
+    "Hiking": "#2DD4BF",
     "Historical Landmark": "#8B5CF6",
-    Museum: "#3F51B5",
-    Nightlife: "#FF1493",
+    "Museum": "#3F51B5",
+    "Nightlife": "#FF1493",
     "Park/Nature": "#4CAF50",
     "Point of Interest": "#FFD400",
     "River/Waterfall": "#0096C7",
-    Shopping: "#FFB703",
+    "Shopping": "#FFB703",
     "Tour/Activity": "#3B82F6",
-    Viewpoint: "#E11D48",
+    "Viewpoint": "#E11D48"
   };
+
   if (byExact[c]) return byExact[c];
   const n = c.toLowerCase();
+
   if (n.includes("beach")) return "#00C8FF";
   if (n.includes("night")) return "#FF1493";
   if (n.includes("food") || n.includes("restaurant")) return "#FF6B00";
@@ -133,52 +130,47 @@ function getCategoryColor(c) {
   if (n.includes("historic") || n.includes("landmark")) return "#8B5CF6";
   if (n.includes("shop")) return "#FFB703";
   if (n.includes("entertainment")) return "#FF0080";
-  if (n.includes("guided") || n.includes("tour") || n.includes("activity"))
-    return "#3B82F6";
-  if (n.includes("water") || n.includes("river") || n.includes("falls"))
-    return "#0096C7";
-  if (n.includes("point")) return "#FFD400";
+  if (n.includes("guided") || n.includes("tour") || n.includes("activity")) return "#3B82F6";
+  if (n.includes("water") || n.includes("river") || n.includes("falls")) return "#0096C7";
+
   return "#3B82F6";
 }
 
+// EXACT emoji map from your file
 const categoryEmojiMap = {
-  Beach: "🏖️",
-  "Beach Bar": "🍹",
-  Bar: "🍸",
-  "Bar / Lounge": "🍸",
-  "Café": "☕",
-  "Coffee": "☕",
-  "Food & Drink": "🍽️",
-  Restaurant: "🍽️",
-  "Historical Landmark": "🏛️",
-  Museum: "🏛️",
-  Nightlife: "🌃",
+  "Beach": "🏖️",
+  "Entertainment": "🎟️",
+  "Food": "🍽️",
+  "Hiking": "🥾",
+  "Historical Landmark": "🏰",
+  "Museum": "🏛️",
+  "Nightlife": "🎵",
   "Park/Nature": "🌳",
   "Point of Interest": "📍",
-  "River/Waterfall": "💧",
-  Shopping: "🛍️",
-  "Tour/Activity": "🎒",
-  Viewpoint: "🌄",
+  "River/Waterfall": "🏞️",
+  "Shopping": "🛍️",
+  "Tour/Activity": "🧭",
+  "Viewpoint": "📸"
 };
 
-function getCategoryEmoji(c) {
+function getCategoryEmoji(c = "") {
   if (!c) return "📍";
   if (categoryEmojiMap[c]) return categoryEmojiMap[c];
+
   const n = c.toLowerCase();
   if (n.includes("beach")) return "🏖️";
-  if (n.includes("night")) return "🌃";
+  if (n.includes("night")) return "🎵";
   if (n.includes("food") || n.includes("restaurant")) return "🍽️";
   if (n.includes("park") || n.includes("nature")) return "🌳";
   if (n.includes("hike")) return "🥾";
-  if (n.includes("view")) return "🌄";
+  if (n.includes("view")) return "📸";
   if (n.includes("museum")) return "🏛️";
-  if (n.includes("historic") || n.includes("landmark")) return "🏛️";
+  if (n.includes("historic") || n.includes("landmark")) return "🏰";
   if (n.includes("shop")) return "🛍️";
-  if (n.includes("guided") || n.includes("tour") || n.includes("activity"))
-    return "🎒";
-  if (n.includes("water") || n.includes("river") || n.includes("falls"))
-    return "💧";
-  if (n.includes("point")) return "📍";
+  if (n.includes("entertainment")) return "🎟️";
+  if (n.includes("tour") || n.includes("activity")) return "🧭";
+  if (n.includes("water") || n.includes("river") || n.includes("falls")) return "🏞️";
+
   return "📍";
 }
 
@@ -186,21 +178,16 @@ function createMarkerIcon(category) {
   const color = getCategoryColor(category);
   const emoji = getCategoryEmoji(category);
 
-  const div = document.createElement("div");
-  div.className = "marker-pin";
-
-  const inner = document.createElement("div");
-  inner.className = "marker-pin-inner";
-  inner.style.backgroundColor = color;
-  inner.textContent = emoji;
-
-  div.appendChild(inner);
-
   return L.divIcon({
-    html: div,
-    className: "",
-    iconSize: [28, 28],
-    iconAnchor: [14, 28],
+    className: "custom-marker",
+    html: `
+      <div class="marker-pin" style="background:${color}">
+        <span class="marker-emoji">${emoji}</span>
+      </div>
+    `,
+    iconSize: [26, 36],
+    iconAnchor: [13, 34],
+    popupAnchor: [0, -32],
   });
 }
 
@@ -837,3 +824,4 @@ if ("serviceWorker" in navigator) {
       });
   });
 }
+
