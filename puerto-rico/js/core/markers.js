@@ -11,6 +11,28 @@ import {
 } from "./favorites.js";
 
 let highlightRing = null;
+let popupFavHandlerInitialized = false;
+
+/* ============================================================
+   GLOBAL DELEGATED HANDLER FOR POPUP FAVORITE BUTTONS
+============================================================ */
+function initPopupFavoriteHandler() {
+  if (popupFavHandlerInitialized) return;
+  popupFavHandlerInitialized = true;
+
+  document.addEventListener("click", (evt) => {
+    const btn = evt.target.closest(".leaflet-popup .fav-btn");
+    if (!btn) return;
+
+    evt.stopPropagation();
+
+    const key = btn.dataset.key;
+    if (!key) return;
+
+    toggleFavorite(key);
+    btn.classList.toggle("fav-active", isFavorite(key));
+  });
+}
 
 export function initMarkers() {
   if (!state.map) throw new Error("Map not initialized");
@@ -24,6 +46,9 @@ export function initMarkers() {
   if (isMobile()) {
     L.Map.prototype.openPopup = function () { return this; };
     L.Popup.prototype.openOn = function () { return this; };
+  } else {
+    // Desktop only: set up global handler for popup favorite buttons
+    initPopupFavoriteHandler();
   }
 
   /* ============================================================
@@ -85,27 +110,12 @@ export function initMarkers() {
        DESKTOP MODE — popups work normally
     ============================================================ */
     if (!isMobile()) {
-      // IMPORTANT FIX: disable sanitization so Leaflet does not strip the heart icon
+      // Disable sanitization so Leaflet does not strip heart / data attributes
       marker.bindPopup(popupHtml, { sanitize: false });
 
       marker.on("click", () => {
         highlightMarker(marker);
         marker.openPopup();
-      });
-
-      // Favorite button logic — always runs with fresh DOM
-      marker.on("popupopen", (e) => {
-        const popupNode = e.popup.getElement();
-        if (!popupNode) return;
-
-        const favBtn = popupNode.querySelector(".fav-btn");
-        if (!favBtn) return;
-
-        favBtn.addEventListener("click", (evt) => {
-          evt.stopPropagation();
-          toggleFavorite(key);
-          favBtn.classList.toggle("fav-active", isFavorite(key));
-        });
       });
     }
 
