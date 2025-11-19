@@ -922,7 +922,7 @@ body {
 /* --- MOBILE REBUILD SECTION (added at bottom) --- */
 @media (max-width: 768px) {
   body { display:block; height:100vh; overflow:hidden; }
-  #map { position:fixed; top:3.1rem; left:0; right:0; bottom:0; width:100%; height:auto; }
+  #map { position:fixed; top:3.1rem; left:0; right:0; bottom:0; width:100%; height:calc(var(--vh) * 100); min-height:calc(var(--vh) * 100); }
   #topBar { left:0.5rem; right:0.5rem; justify-content:space-between; }
 
   #sidebar {
@@ -957,3 +957,6 @@ body {
   .sheet-handle { display:block; width:52px; height:5px; border-radius:999px; background:#d1d5db; margin:0.4rem auto; }
 }
 @media (min-width: 769px) { .place-sheet { display:none; } }
+
+:root{--vh:1vh;}
+#map{min-height:100vh;}
