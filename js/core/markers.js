@@ -22,6 +22,8 @@ export function initMarkers() {
   state.markers = [];
   state.clusterGroup = clusterGroup;
 
+  const isMobile = () => window.innerWidth <= 768;
+
   state.places.forEach((p, index) => {
     const lat = Number(p.latitude);
     const lng = Number(p.longitude);
@@ -39,39 +41,56 @@ export function initMarkers() {
       p.google_maps_url || p.map_url || p.maps_url || p.google_url || null;
 
     const popupHtml = buildPopupHtml(p, key, url);
-    marker.bindPopup(popupHtml);
 
-    marker.on("click", () => {
-      highlightMarker(marker);
-      if (window.innerWidth <= 768) {
-        // let UI handle showing sheet via custom event
+    // DESKTOP ONLY: bind popup
+    if (!isMobile()) {
+      marker.bindPopup(popupHtml);
+
+      // Desktop click → open popup
+      marker.on("click", () => {
+        highlightMarker(marker);
+        marker.openPopup();
+      });
+
+      // Attach favorite button in popup
+      marker.on("popupopen", (e) => {
+        const popupNode = e.popup._contentNode;
+        const favBtn = popupNode.querySelector(".fav-btn");
+        if (favBtn) {
+          favBtn.onclick = (evt) => {
+            evt.stopPropagation();
+            const k = favBtn.dataset.key;
+            toggleFavorite(k);
+            if (isFavorite(k)) favBtn.classList.add("fav-active");
+            else favBtn.classList.remove("fav-active");
+          };
+        }
+      });
+
+    } else {
+      // MOBILE ONLY: disable popups completely
+      marker.unbindPopup();
+
+      // Mobile click → open bottom-sheet
+      marker.on("click", () => {
+        highlightMarker(marker);
+
         const evt = new CustomEvent("place:openSheet", {
           detail: { place: p, key, index },
         });
         window.dispatchEvent(evt);
-      } else {
-        marker.openPopup();
-      }
-    });
+      });
 
-    marker.on("popupopen", (e) => {
-      const popupNode = e.popup._contentNode;
-      const favBtn = popupNode.querySelector(".fav-btn");
-      if (favBtn) {
-        favBtn.onclick = (evt) => {
-          evt.stopPropagation();
-          const k = favBtn.dataset.key;
-          toggleFavorite(k);
-          if (isFavorite(k)) favBtn.classList.add("fav-active");
-          else favBtn.classList.remove("fav-active");
-        };
-      }
-    });
+      // Prevent long press or weird popup events
+      marker.on("popupopen", () => marker.closePopup());
+    }
 
+    // Marker selection effect (desktop + mobile)
     marker.on("click", () => {
       document
         .querySelectorAll(".marker-pin")
         .forEach((pEl) => pEl.classList.remove("marker-pin-selected"));
+
       const el = marker._icon;
       if (el) {
         const pin = el.querySelector(".marker-pin");
@@ -86,6 +105,9 @@ export function initMarkers() {
   state.map.addLayer(clusterGroup);
 }
 
+/* =====================================================================
+   MARKER ICON
+===================================================================== */
 function createMarkerIcon(category) {
   const color = getCategoryColor(category);
   const emoji = getCategoryEmoji(category);
@@ -103,31 +125,49 @@ function createMarkerIcon(category) {
   });
 }
 
+/* =====================================================================
+   POPUP HTML (Desktop Only)
+===================================================================== */
 function buildPopupHtml(place, key, url) {
   let html = "<div class='popup-card'>";
-  html += `<div class="popup-header">
-    <div class="popup-title">${place.title || ""}</div>
-    <button class="fav-btn ${isFavorite(key) ? "fav-active" : ""}" data-key="${key}">♡</button>
-  </div>`;
+
+  html += `
+    <div class="popup-header">
+      <div class="popup-title">${place.title || ""}</div>
+      <button class="fav-btn ${isFavorite(key) ? "fav-active" : ""}" data-key="${key}">
+        ♡
+      </button>
+    </div>
+  `;
+
   if (place.category) {
     html += `<div class="popup-category">${place.category}</div>`;
   }
+
   if (place.image_url) {
-    html += `<div class="popup-image-wrapper skeleton">
-      <img loading="lazy" src="${place.image_url}" class="skeleton"
-           onload="this.classList.remove('skeleton'); this.parentElement.classList.remove('skeleton');" />
-    </div>`;
+    html += `
+      <div class="popup-image-wrapper skeleton">
+        <img loading="lazy" src="${place.image_url}" class="skeleton"
+             onload="this.classList.remove('skeleton'); this.parentElement.classList.remove('skeleton');" />
+      </div>
+    `;
   }
+
   if (place.description) {
     html += `<div class="popup-desc">${place.description}</div>`;
   }
+
   if (url) {
     html += `<a class="popup-button" target="_blank" href="${url}">Open in Google Maps</a>`;
   }
+
   html += "</div>";
   return html;
 }
 
+/* =====================================================================
+   HIGHLIGHT EFFECT (Desktop + Mobile)
+===================================================================== */
 export function highlightMarker(marker) {
   if (!marker || !state.map) return;
 
@@ -135,6 +175,7 @@ export function highlightMarker(marker) {
     state.map.removeLayer(highlightRing);
     highlightRing = null;
   }
+
   highlightRing = L.circleMarker(marker.getLatLng(), {
     radius: 18,
     color: "#38BDF8",
