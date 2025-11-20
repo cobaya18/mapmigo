@@ -153,6 +153,31 @@ body {
   gap: 0.45rem;
 }
 
+.close-btn {
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  
+  padding: 0.45rem 0.9rem;
+  height: 2.4rem;
+
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #111827;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: background 0.15s ease;
+}
+
+.close-btn:hover {
+  background: #f3f4f6;
+}
+
+
 
 /* =====================================================================
    SEARCH RESULTS DROPDOWN (FLOATING)
@@ -838,6 +863,7 @@ body {
     background-position: -200% 0;
   }
 }
+
 
 
 
