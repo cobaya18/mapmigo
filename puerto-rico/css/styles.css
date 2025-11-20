@@ -42,7 +42,9 @@ html, body {
   align-items: center;
   gap: 0.7rem;
   pointer-events: none;
+  min-height: 3.1rem;        /* <-- NEW: prevents collapse after JS init */
 }
+
 
 /* SEARCH BAR — shortened on desktop */
 #searchBarWrapper {
@@ -765,3 +767,4 @@ html, body {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
