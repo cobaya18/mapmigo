@@ -1,6 +1,6 @@
 // js/core/util.js
 export function normalize(str) {
-  if (str == null) return ""; // <-- FIX: handles null, undefined
+  if (str == null) return ""; // handles null AND undefined
   return String(str)
     .toLowerCase()
     .normalize("NFD")
@@ -110,3 +110,4 @@ export function getPlaceKey(place, index) {
   if (place.slug) return "slug:" + place.slug;
   return "idx:" + index + ":" + (place.title || "");
 }
+
