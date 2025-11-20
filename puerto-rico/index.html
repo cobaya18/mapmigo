@@ -16,10 +16,11 @@
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""
   />
 
-  <!-- MarkerCluster CSS -->
+  <!-- MarkerCluster CSS (correct file) -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
@@ -57,66 +58,79 @@
   </div>
 </div>
 
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <div class="sidebar-handle"></div>
-
-  <div class="sidebar-header">
-    <div class="sidebar-header-title">Filters</div>
-  </div>
-
-  <div id="infoBar">Loading places…</div>
-
-  <div class="filter-group">
-    <h4>Filter by Category</h4>
-    <div id="categoryButtons" class="filter-buttons"></div>
-  </div>
-
-  <div class="filter-group">
-    <h4>Filter by Region</h4>
-    <div id="regionButtons" class="filter-buttons"></div>
-  </div>
-
-  <div class="filter-group filter-group-reset">
-    <button id="resetFiltersSidebar" class="reset-filters-btn">Reset Filters</button>
-  </div>
+<!-- INFO BAR -->
+<div id="infoBar" class="info-bar">
+  Loading places…
 </div>
 
-<!-- MAP -->
-<div id="map"></div>
+<!-- MAIN LAYOUT -->
+<div id="layout">
 
-<!-- UNIFIED MAP CONTROLS -->
-<div id="mapControls">
-  <button id="zoomInBtn" class="floating-btn">＋</button>
-  <button id="zoomOutBtn" class="floating-btn">－</button>
+  <!-- SIDEBAR (DESKTOP + MOBILE SHEET) -->
+  <aside id="sidebar" class="sidebar collapsed-desktop">
+    <div class="sidebar-header">
+      <h1 class="app-title">MapMigo</h1>
+      <p class="app-subtitle">Puerto Rico places map</p>
+      <button id="closeSidebarMobile" aria-label="Close filters">&times;</button>
+    </div>
 
-  <div class="map-style-group">
-    <button id="mapStyleToggle" class="floating-btn">
-      <span class="icon">🛰️</span>
-      <span>Map</span>
-    </button>
+    <!-- FILTERS -->
+    <div id="filters" class="filters">
+      <div class="filter-group">
+        <h2>Categories</h2>
+        <div id="categoryChips" class="chip-group"></div>
+      </div>
 
-    <div id="mapStyleMenu" class="floating-menu">
-      <button class="style-option active" data-theme="Satellite">🛰 Satellite</button>
-      <button class="style-option" data-theme="Dark">⬛ Dark</button>
-      <button class="style-option" data-theme="Light">◻️ Light</button>
+      <div class="filter-group">
+        <h2>Regions</h2>
+        <div id="regionButtons" class="filter-buttons"></div>
+      </div>
+
+      <div class="filter-group filter-group-reset">
+        <button id="resetFiltersSidebar" class="reset-filters-btn">Reset Filters</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAP -->
+  <div id="map"></div>
+
+  <!-- UNIFIED MAP CONTROLS -->
+  <div id="mapControls">
+    <button id="zoomInBtn" class="floating-btn">＋</button>
+    <button id="zoomOutBtn" class="floating-btn">－</button>
+
+    <div class="map-style-group">
+      <button id="mapStyleToggle" class="floating-btn">
+        <span class="icon">🛰️</span>
+        <span>Map</span>
+      </button>
+
+      <div id="mapStyleMenu" class="floating-menu">
+        <button class="style-option active" data-theme="Satellite">🛰 Satellite</button>
+        <button class="style-option" data-theme="Dark">⬛ Dark</button>
+        <button class="style-option" data-theme="Light">◻️ Light</button>
+      </div>
+    </div>
+
+    <button id="gpsButton" class="floating-btn">📍</button>
+  </div>
+
+  <!-- LIST VIEW OVERLAY -->
+  <div id="listViewOverlay" class="list-overlay" aria-hidden="true">
+    <div class="list-overlay-inner">
+      <header class="list-overlay-header">
+        <button id="closeListView" class="overlay-back-btn">←</button>
+        <h2 id="listHeaderTitle">All places</h2>
+      </header>
+      <div id="listViewList" class="list-view-list"></div>
     </div>
   </div>
 
-  <button id="gpsButton" class="floating-btn">📍</button>
-</div>
-
-<!-- LIST VIEW -->
-<div id="listViewOverlay" class="closed">
-  <div class="list-header">
-    <div id="listHeaderTitle" class="list-header-title">Places list</div>
-    <button id="closeListView" class="close-btn">Close</button>
-  </div>
-  <div id="listViewList"></div>
-</div>
+</div> <!-- /layout -->
 
 <!-- MOBILE PLACE SHEET -->
-<div id="placeSheet" class="place-sheet">
+<div id="placeSheet" class="place-sheet sheet-hidden" aria-hidden="true" aria-label="Place details">
   <div class="sheet-handle"></div>
 
   <div class="place-sheet-inner">
