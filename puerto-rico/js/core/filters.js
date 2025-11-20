@@ -111,10 +111,8 @@ export function applyFilters(queryText = "") {
     const m = state.markers[i];
     if (!m) return;
 
-    const inCat =
-      activeCats.length === 0 || activeCats.includes(p.category);
-    const inReg =
-      activeRegs.length === 0 || activeRegs.includes(p.region);
+    const inCat = activeCats.length === 0 || activeCats.includes(p.category);
+    const inReg = activeRegs.length === 0 || activeRegs.includes(p.region);
     const inSearch =
       !q.trim() ||
       softMatch(p.title, q) ||
@@ -141,6 +139,10 @@ export function applyFilters(queryText = "") {
     })
   );
 
+  // NEW: expose filtered places for UI (list view, saved, mobile sheet)
+  state.filteredPlaces = visible;
+
+  // Existing consumer (if any)
   state.currentVisible = visible;
 
   if (visible.length > 0 && bounds && !q.trim()) {
@@ -170,4 +172,3 @@ function updateInfoBar(visibleCount, activeCats, activeRegs) {
 
   infoBar.textContent = parts.join(" • ");
 }
-
