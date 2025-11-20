@@ -35,7 +35,11 @@
       <button id="searchButton" aria-label="Search">🔍</button>
     </div>
 
-    <button id="openListView" aria-label="Open list view">List</button>
+    <!-- LIST + SAVED BUTTONS -->
+    <div id="topBarButtons">
+      <button id="openListView" aria-label="Open list view">List</button>
+      <button id="openSavedView" aria-label="Open saved places">Saved</button>
+    </div>
   </div>
 
   <!-- SEARCH RESULTS DROPDOWN -->
@@ -50,9 +54,7 @@
 
     <div class="sidebar-header">
       <div class="sidebar-header-title">Filters</div>
-      <div class="sidebar-header-actions">
-        <button id="openSavedView">Saved</button>
-      </div>
+      <!-- Saved button removed from here -->
     </div>
 
     <div id="infoBar">Loading places…</div>
