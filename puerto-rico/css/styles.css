@@ -876,16 +876,19 @@ body {
   }
 
   #mobileFilterHandle {
-    position: fixed;
-    bottom: calc(env(safe-area-inset-bottom) + 1rem);
-    left: 50%;
-    transform: translateX(-50%);
-    width: 64px;
-    height: 6px;
-    border-radius: 999px;
-    background: #d1d5db;
-    z-index: 1001;
-  }
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 14px;
+  border-radius: 999px;
+  background: #d1d5db;
+  z-index: 1001;
+
+  /* Place above home indicator / browser chrome */
+  bottom: 1.5rem;
+  bottom: calc(env(safe-area-inset-bottom) + 1.5rem);
+}
 
   /* Mobile list & saved view as bottom sheet / split view */
   #listViewOverlay {
