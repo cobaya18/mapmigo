@@ -4,21 +4,21 @@
 
 :root {
   --bg: #f3f4f6;
-  --surface: #ffffff;
-  --surface-soft: #f9fafb;
+  --bg-elevated: #ffffff;
   --border-subtle: #e5e7eb;
-  --border-strong: #d1d5db;
   --text-main: #111827;
   --text-muted: #6b7280;
   --accent: #2563eb;
-  --accent-soft: #dbeafe;
-  --danger: #b91c1c;
-
-  --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.12);
-  --shadow-strong: 0 16px 40px rgba(0, 0, 0, 0.24);
+  --accent-soft: #eff6ff;
+  --accent-strong: #1d4ed8;
+  --danger-soft: #fee2e2;
+  --danger-strong: #b91c1c;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --shadow-soft: 0 10px 40px rgba(15, 23, 42, 0.18);
 }
 
-/* Global reset */
+/* Global reset-ish */
 *,
 *::before,
 *::after {
@@ -29,11 +29,10 @@ html,
 body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-    "Segoe UI", sans-serif;
-  background: var(--bg);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  background-color: var(--bg);
   color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
@@ -696,7 +695,7 @@ body {
 }
 
 /* =====================================================================
-   MOBILE PLACE SHEET
+   MOBILE PLACE SHEET (MAP-FIRST LAYOUT)
 ===================================================================== */
 
 .place-sheet {
@@ -704,106 +703,156 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 12000;
   border-radius: 1rem 1rem 0 0;
   background: #ffffff;
-  z-index: 12000;
-  transform: translateY(110%);
-  transition: transform 0.25s ease;
-  max-height: calc(var(--vh, 1vh) * 80);
   box-shadow: 0 -16px 34px rgba(0,0,0,0.35);
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+  will-change: transform;
 }
 
-.place-sheet.visible {
-  transform: translateY(0);
+/* State classes */
+.place-sheet.sheet-hidden {
+  transform: translateY(100%);
+  pointer-events: none;
 }
 
-.place-sheet.expanded {
-  max-height: calc(var(--vh, 1vh) * 90);
+.place-sheet.sheet-peek,
+.place-sheet.sheet-half,
+.place-sheet.sheet-full {
+  pointer-events: auto;
 }
 
-.sheet-handle {
-  width: 52px;
-  height: 5px;
-  background: #d1d5db;
-  border-radius: 999px;
-  margin: 0.5rem auto;
+@media (max-width: 768px) {
+  :root {
+    --sheet-peek-height: calc(var(--vh, 1vh) * 22);
+    --sheet-half-height: calc(var(--vh, 1vh) * 55);
+  }
+
+  .place-sheet.sheet-peek {
+    transform: translateY(calc(100% - var(--sheet-peek-height)));
+  }
+
+  .place-sheet.sheet-half {
+    transform: translateY(calc(100% - var(--sheet-half-height)));
+  }
+
+  .place-sheet.sheet-full {
+    transform: translateY(0);
+  }
+}
+
+/* Desktop: hide sheet UI entirely */
+@media (min-width: 769px) {
+  .place-sheet {
+    display: none;
+  }
 }
 
 .place-sheet-inner {
-  padding: 0 1rem 1rem;
+  position: relative;
+  padding: 0.5rem 1rem 1rem;
   height: 100%;
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sheet-handle {
+  width: 48px;
+  height: 5px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  margin: 0.4rem auto 0.45rem;
 }
 
 #sheetPreview {
+  padding-bottom: 0.35rem;
   border-bottom: 1px solid #e5e7eb;
-  padding-bottom: 0.5rem;
 }
 
 .sheet-title-row {
   display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
 }
 
 #sheetTitle {
-  font-weight: 600;
   font-size: 1rem;
-}
-
-#sheetFavBtn {
-  background: transparent;
-  border: none;
-  font-size: 1.2rem;
-  color: #9ca3af;
-  cursor: pointer;
-}
-
-#sheetFavBtn.fav-active {
-  color: #f97316;
+  font-weight: 600;
+  color: #111827;
 }
 
 #sheetMeta {
-  font-size: 0.78rem;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
   color: #6b7280;
-  margin-bottom: 0.4rem;
+}
+
+#sheetFavBtn {
+  border: none;
+  background: #f3f4f6;
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+#sheetFavBtn.fav-active {
+  background: #fee2e2;
+  color: #b91c1c;
 }
 
 #sheetExpand {
-  border-radius: 999px;
-  padding: 0.35rem 0.75rem;
-  background: #eef2f7;
-  border: 1px solid #d1d5db;
-  font-size: 0.78rem;
-  cursor: pointer;
+  margin-top: 0.4rem;
+  border: none;
+  background: transparent;
+  font-size: 0.8rem;
+  color: #2563eb;
+  padding: 0;
+  text-decoration: underline;
 }
 
+/* Scrollable content area */
 #sheetDetails {
+  margin-top: 0.5rem;
+  padding-top: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   overflow-y: auto;
-  padding-top: 0.55rem;
+  -webkit-overflow-scrolling: touch;
 }
 
 #sheetImage {
   width: 100%;
-  border-radius: 0.9rem;
-  margin-bottom: 0.7rem;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  display: none;
 }
 
 #sheetDescription {
-  font-size: 0.85rem;
-  color: #374151;
-  margin-bottom: 0.6rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #4b5563;
 }
 
 #sheetMapsBtn {
-  display: inline-block;
-  padding: 0.48rem 0.75rem;
-  background: #eff6ff;
-  color: #1d4ed8;
-  border-radius: 999px;
-  border: 1px solid #2563eb;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.25rem;
+  padding: 0.45rem 0.9rem;
   font-size: 0.82rem;
   font-weight: 500;
+  border-radius: 999px;
+  border: 1px solid #2563eb;
+  color: #1d4ed8;
+  background: #eff6ff;
   text-decoration: none;
 }
 
@@ -861,9 +910,23 @@ body {
 ===================================================================== */
 
 .skeleton {
-  background: linear-gradient(90deg, #e5e7eb, #f3f4f6, #e5e7eb);
+  position: relative;
+  overflow: hidden;
+  background-color: #e5e7eb;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.7),
+    rgba(255, 255, 255, 0)
+  );
   background-size: 200% 100%;
-  animation: skeleton-loading 1.2s ease-in-out infinite;
+  animation: skeleton-loading 1.1s infinite;
 }
 
 @keyframes skeleton-loading {
@@ -874,6 +937,7 @@ body {
     background-position: -200% 0;
   }
 }
+
 
 
 
