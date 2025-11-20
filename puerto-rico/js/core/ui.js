@@ -75,14 +75,18 @@ function initListView() {
 
   if (!overlay || !listViewList) return;
 
- function renderListView(items, mode = "all") {
-  if (!items || !Array.isArray(items)) {
-    // fallback empty state
-    listViewList.innerHTML = "<div class='list-empty-state' style='padding:0.75rem;'>No places loaded.</div>";
-    return;
-  }
+  function renderListView(items, mode = "all") {
+    if (!Array.isArray(items)) {
+      listViewList.innerHTML = "";
+      const empty = document.createElement("div");
+      empty.className = "list-empty-state";
+      empty.textContent = "No places loaded yet.";
+      empty.style.padding = "0.75rem";
+      listViewList.appendChild(empty);
+      return;
+    }
 
-  const sorted = [...items].sort((a, b) =>
+    const sorted = [...items].sort((a, b) =>
       (a.place.title || "").localeCompare(b.place.title || "", "en", {
         sensitivity: "base",
       })
@@ -107,11 +111,14 @@ function initListView() {
       const item = document.createElement("button");
       item.className = "list-item";
 
-      /* MAIN CONTAINER */
+      // MAIN CONTAINER
       const content = document.createElement("div");
       content.className = "list-item-content";
 
-      /* TITLE ROW + HEART */
+      const details = document.createElement("div");
+      details.className = "list-item-details";
+
+      // TITLE ROW + HEART
       const titleRow = document.createElement("div");
       titleRow.className = "list-title-row";
 
@@ -132,19 +139,19 @@ function initListView() {
       titleRow.appendChild(titleEl);
       titleRow.appendChild(favBtn);
 
-      /* META */
+      // META
       const metaEl = document.createElement("div");
       metaEl.className = "list-meta";
       metaEl.textContent = [place.category, place.region]
         .filter(Boolean)
         .join(" • ");
 
-      /* DESCRIPTION (ellipsis automatic) */
+      // DESCRIPTION
       const descEl = document.createElement("div");
       descEl.className = "list-desc";
       descEl.textContent = place.description || "";
 
-      /* CONTENT STACK */
+      // CONTENT STACK
       details.appendChild(titleRow);
       details.appendChild(metaEl);
       details.appendChild(descEl);
@@ -178,7 +185,13 @@ function initListView() {
     overlay.classList.add("open");
     overlay.setAttribute("aria-hidden", "false");
     listHeaderTitleEl.textContent = "All places";
-    renderListView(state.filteredPlaces, "all");
+
+    const items =
+      state.filteredPlaces && state.filteredPlaces.length
+        ? state.filteredPlaces
+        : state.currentVisible || [];
+
+    renderListView(items, "all");
   }
 
   function openListViewSaved() {
@@ -188,7 +201,12 @@ function initListView() {
     listHeaderTitleEl.textContent = "Saved places";
 
     const favorites = getFavoriteKeys();
-    const items = state.filteredPlaces.filter(({ place, index }) => {
+    const source =
+      state.filteredPlaces && state.filteredPlaces.length
+        ? state.filteredPlaces
+        : state.currentVisible || [];
+
+    const items = source.filter(({ place, index }) => {
       const key = getPlaceKey(place, index);
       return favorites.includes(key);
     });
@@ -454,4 +472,3 @@ function initPlaceSheet() {
     closeSheet();
   });
 }
-
