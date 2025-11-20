@@ -44,15 +44,21 @@ html, body {
   pointer-events: none;
 }
 
-/* NEW WRAPPER FOR LIST + SAVED BUTTONS */
-#topBarButtons {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
+/* SEARCH BAR — shortened on desktop */
+#searchBarWrapper {
   pointer-events: auto;
+  flex: 1;
+  max-width: 55%; /* <-- SHORTER SEARCH BAR ON DESKTOP */
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
 }
 
-/* Style Saved EXACTLY like List */
+/* Buttons identical style */
 #hamburgerButton,
 #openListView,
 #openSavedView {
@@ -72,19 +78,18 @@ html, body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
 }
 
-/* Search bar... (unchanged) */
-#searchBarWrapper {
-  pointer-events: auto;
-  flex: 1;
+/* RIGHT-ALIGNED BUTTON WRAPPER */
+#topBarButtons {
   display: flex;
-  align-items: center;
-  background: #ffffff;
-  border-radius: 999px;
-  padding: 0.3rem 0.45rem;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+  flex-direction: row;  /* <-- horizontal on desktop */
+  gap: 0.45rem;
+  pointer-events: auto;
+  margin-left: auto;    /* <-- pushes both to right */
 }
 
+/* =====================================================================
+   SEARCH BAR INPUT
+===================================================================== */
 #search {
   flex: 1;
   border: none;
@@ -192,7 +197,7 @@ html, body {
   transform: translateX(-120%);
 }
 
-/* Sidebar handle (only mobile) */
+/* Sidebar handle (mobile only) */
 .sidebar-handle {
   display: none;
   width: 48px;
@@ -449,7 +454,6 @@ html, body {
   color: white;
 }
 
-/* MARKER STYLES */
 .custom-marker .marker-pin {
   width: 22px;
   height: 22px;
@@ -471,7 +475,6 @@ html, body {
   font-size: 13px;
 }
 
-/* highlight animation */
 .marker-highlight-ring {
   animation: markerPulse 0.8s ease-out forwards;
 }
@@ -585,7 +588,7 @@ html, body {
 }
 
 /* =====================================================================
-   MOBILE PLACE SHEET (Bottom Sheet)
+   MOBILE PLACE SHEET
 ===================================================================== */
 .place-sheet {
   position: fixed;
@@ -736,6 +739,17 @@ html, body {
     border-radius: 1rem 1rem 0 0;
     width: auto;
   }
+
+  /* MOBILE: vertical Saved + List View */
+  #topBarButtons {
+    flex-direction: column;
+  }
+
+  /* MOBILE: search bar becomes full width */
+  #searchBarWrapper {
+    max-width: none;
+    flex: 1;
+  }
 }
 
 /* =====================================================================
@@ -751,5 +765,3 @@ html, body {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
-
-
