@@ -632,11 +632,12 @@ body {
 }
 
 .list-thumb {
-  width: 60px;
-  height: 60px;
-  border-radius: 0.7rem;
+  width: 110px;      /* wider */
+  height: 110px;     /* same height → perfect square */
+  border-radius: 0.85rem;
   background: #e5e7eb;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .list-thumb img {
@@ -863,6 +864,7 @@ body {
     background-position: -200% 0;
   }
 }
+
 
 
 
