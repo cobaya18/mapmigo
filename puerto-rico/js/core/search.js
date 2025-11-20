@@ -4,6 +4,8 @@ import { relevanceScore, getPlaceKey } from "./util.js";
 import { highlightMarker } from "./markers.js";
 import { applyFilters } from "./filters.js";
 
+let outsideCloseHandlerAttached = false;
+
 export function initSearch() {
   const input = document.getElementById("search");
   const clearBtn = document.getElementById("searchClear");
@@ -36,6 +38,7 @@ export function initSearch() {
       renderSearchResults([], "");
       const sr = document.getElementById("searchResults");
       if (sr) sr.style.display = "none";
+      detachOutsideListener();
     });
   }
 
@@ -48,6 +51,44 @@ export function initSearch() {
   }
 }
 
+/* ------------------------------------------------------------
+   CLICK OUTSIDE TO CLOSE DROPDOWN
+------------------------------------------------------------ */
+
+function attachOutsideListener() {
+  if (outsideCloseHandlerAttached) return;
+
+  outsideCloseHandlerAttached = true;
+
+  setTimeout(() => {
+    document.addEventListener("pointerdown", handleClickOutside, true);
+  }, 0);
+}
+
+function detachOutsideListener() {
+  if (!outsideCloseHandlerAttached) return;
+
+  outsideCloseHandlerAttached = false;
+  document.removeEventListener("pointerdown", handleClickOutside, true);
+}
+
+function handleClickOutside(e) {
+  const overlay = document.getElementById("searchResults");
+  const wrapper = document.getElementById("searchBarWrapper");
+
+  if (!overlay || !wrapper) return;
+
+  // If click is OUTSIDE the search bar AND results dropdown → close it
+  if (!wrapper.contains(e.target) && !overlay.contains(e.target)) {
+    overlay.style.display = "none";
+    detachOutsideListener();
+  }
+}
+
+/* ------------------------------------------------------------
+   SEARCH RESULTS RENDERING
+------------------------------------------------------------ */
+
 function renderSearchResults(items, q) {
   const overlay = document.getElementById("searchResults");
   const list = document.getElementById("searchResultsList");
@@ -57,6 +98,7 @@ function renderSearchResults(items, q) {
   if (!q.trim() || items.length === 0) {
     overlay.style.display = "none";
     list.innerHTML = "";
+    detachOutsideListener();
     return;
   }
 
@@ -73,6 +115,7 @@ function renderSearchResults(items, q) {
   if (scored.length === 0) {
     overlay.style.display = "none";
     list.innerHTML = "";
+    detachOutsideListener();
     return;
   }
 
@@ -91,6 +134,7 @@ function renderSearchResults(items, q) {
       if (!m || !state.map) return;
       state.map.setView(m.getLatLng(), 14);
       highlightMarker(m);
+
       if (window.innerWidth <= 768) {
         const key = getPlaceKey(place, index);
         const evt = new CustomEvent("place:openSheet", {
@@ -100,9 +144,16 @@ function renderSearchResults(items, q) {
       } else {
         m.fire("click");
       }
+
+      // Select → close dropdown
+      overlay.style.display = "none";
+      detachOutsideListener();
     };
     list.appendChild(div);
   });
 
   overlay.style.display = "block";
+
+  // Dropdown opened → enable outside close
+  attachOutsideListener();
 }
