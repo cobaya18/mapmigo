@@ -1,151 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>MapMigo — Puerto Rico</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- PWA / Icons -->
-  <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#f3f4f6">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-  <!-- MarkerCluster CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-
-  <!-- Main CSS -->
-  <link rel="stylesheet" href="./css/styles.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MapMigo - Puerto Rico Map Guide</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#ffffff" />
 </head>
 
 <body>
+    <div id="appContainer">
 
-<!-- TOP BAR -->
-<div id="topBar">
-  <button id="hamburgerButton" aria-label="Toggle filters">☰</button>
+        <!-- ---------------- TOP BAR ---------------- -->
+        <div id="topBar">
+            <div id="searchBarWrapper">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search places..."
+                    autocomplete="off"
+                />
 
-  <div id="searchBarWrapper">
-    <input id="search" placeholder="Search places…" aria-label="Search places" />
-    <button id="searchClear" aria-label="Clear search">✕</button>
-    <button id="searchButton" aria-label="Search">🔍</button>
-  </div>
+                <button id="searchClearButton" class="icon-btn hidden">✕</button>
+            </div>
+            <!-- end searchBarWrapper -->
 
-  <div id="topBarButtons">
-    <button id="openSavedView" aria-label="Open saved places">Saved</button>
-    <button id="openListView" aria-label="Open list view">List View</button>
-  </div>
-</div>
+            <!-- *** FIX APPLIED: searchResults inserted here *** -->
+            <div id="searchResults">
+                <div class="search-results-header">Search results</div>
+                <div id="searchResultsList"></div>
+            </div>
 
-  <!-- SEARCH RESULTS DROPDOWN -->
-  <div id="searchResults">
-    <div class="search-results-header">Search results</div>
-    <div id="searchResultsList"></div>
-  </div>
-
-  <!-- SIDEBAR -->
-  <div id="sidebar">
-    <div class="sidebar-handle"></div>
-
-    <div class="sidebar-header">
-      <div class="sidebar-header-title">Filters</div>
-      <!-- Saved button removed from here -->
-    </div>
-
-    <div id="infoBar">Loading places…</div>
-
-    <div class="filter-group">
-      <h4>Filter by Category</h4>
-      <div id="categoryButtons" class="filter-buttons"></div>
-    </div>
-
-    <div class="filter-group">
-      <h4>Filter by Region</h4>
-      <div id="regionButtons" class="filter-buttons"></div>
-    </div>
-
-    <div class="filter-group filter-group-reset">
-      <button id="resetFiltersSidebar" class="reset-filters-btn">Reset Filters</button>
-    </div>
-  </div>
-
-  <!-- MAP -->
-  <div id="map"></div>
-
-  <!-- MAP STYLE TOGGLE -->
-  <button id="mapStyleToggle">
-    <span class="icon">🛰️</span>
-    <span>Map</span>
-  </button>
-
-  <div id="mapStyleMenu">
-    <button class="style-option active" data-theme="Satellite">
-      <span class="icon">🛰️</span><span>Satellite</span>
-    </button>
-    <button class="style-option" data-theme="Dark">
-      <span class="icon">⬛</span><span>Dark</span>
-    </button>
-    <button class="style-option" data-theme="Light">
-      <span class="icon">◻️</span><span>Light</span>
-    </button>
-  </div>
-
-  <!-- GPS BUTTON -->
-  <button id="gpsButton" title="Find my location">📍</button>
-
-  <!-- LIST VIEW OVERLAY -->
-  <div id="listViewOverlay" class="closed">
-    <div class="list-header">
-      <div id="listHeaderTitle" class="list-header-title">Places list</div>
-      <button id="closeListView">Close</button>
-    </div>
-    <div id="listViewList"></div>
-  </div>
-
-  <!-- MOBILE PLACE SHEET -->
-  <div id="placeSheet" class="place-sheet">
-    <div class="sheet-handle"></div>
-
-    <div class="place-sheet-inner">
-      <div id="sheetPreview">
-        <div class="sheet-title-row">
-          <div id="sheetTitle"></div>
-          <button id="sheetFavBtn">♡</button>
+            <div id="topBarButtons">
+                <button id="filtersButton" class="icon-btn">☰</button>
+                <button id="favoritesButton" class="icon-btn">★</button>
+            </div>
         </div>
-        <div id="sheetMeta"></div>
-        <button id="sheetExpand">Expand</button>
-      </div>
+        <!-- end topBar -->
 
-      <div id="sheetDetails">
-        <img id="sheetImage" alt="" />
-        <p id="sheetDescription"></p>
-        <a id="sheetMapsBtn" target="_blank" href="#">Open in Google Maps</a>
-      </div>
+        <!-- ---------------- SIDEBAR ---------------- -->
+        <div id="sidebarOverlay"></div>
+        <div id="sidebar">
+            <div id="sidebarContent">
+                <h2>Filters</h2>
+
+                <div class="filter-section">
+                    <h3>Categories</h3>
+                    <div id="categoryFilters"></div>
+                </div>
+
+                <div class="filter-section">
+                    <h3>Regions</h3>
+                    <div id="regionFilters"></div>
+                </div>
+
+                <button id="clearFiltersButton" class="clear-btn">Clear filters</button>
+            </div>
+        </div>
+
+        <!-- ---------------- MAP ---------------- -->
+        <div id="mapContainer">
+            <div id="map"></div>
+
+            <button id="gpsButton" class="floating-btn">📍</button>
+            <button id="mapStyleButton" class="floating-btn">🗺</button>
+
+            <div id="mapStyleMenu" class="hidden">
+                <button data-style="streets">Streets</button>
+                <button data-style="satellite">Satellite</button>
+                <button data-style="outdoors">Outdoors</button>
+            </div>
+        </div>
+
+        <!-- ---------------- LIST VIEW ---------------- -->
+        <div id="listViewOverlay" class="hidden">
+            <div id="listViewHeader">
+                <button id="listViewCloseButton">✕</button>
+                <h2>Places</h2>
+            </div>
+
+            <div id="listViewContent"></div>
+        </div>
+
+        <!-- ---------------- MOBILE PLACE SHEET ---------------- -->
+        <div id="mobilePlaceSheet" class="hidden">
+            <div id="mobileSheetHandle"></div>
+            <div id="mobileSheetContent"></div>
+        </div>
     </div>
-  </div>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- MarkerCluster JS -->
-  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-
-  <!-- Main App (ES module) -->
-  <script type="module" src="./js/app.js"></script>
-
-  <!-- Service worker -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("./service-worker.js")
-          .catch((err) => console.log("SW registration failed", err));
-      });
-    }
-  </script>
-
+    <!-- ---------------- SCRIPTS ---------------- -->
+    <script type="module" src="app.js"></script>
 </body>
 </html>
