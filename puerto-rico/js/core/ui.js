@@ -4,6 +4,13 @@ import { getPlaceKey } from "./util.js";
 import { isFavorite, toggleFavorite, getFavoriteKeys } from "./favorites.js";
 import { highlightMarker } from "./markers.js";
 
+const SHEET_STATES = {
+  HIDDEN: "hidden",
+  PEEK: "peek",
+  HALF: "half",
+  FULL: "full",
+};
+
 export function initUI() {
   initViewportFix();
   initSidebarToggle();
@@ -27,6 +34,7 @@ function initViewportFix() {
 function initSidebarToggle() {
   const sidebar = document.getElementById("sidebar");
   const hamburgerButton = document.getElementById("hamburgerButton");
+  const closeSidebarMobile = document.getElementById("closeSidebarMobile");
 
   if (!sidebar || !hamburgerButton) return;
 
@@ -35,9 +43,17 @@ function initSidebarToggle() {
   function toggleSidebar() {
     if (isMobile()) {
       sidebar.classList.toggle("open-mobile");
+      sidebar.classList.remove("collapsed-desktop");
     } else {
       sidebar.classList.toggle("collapsed-desktop");
+      sidebar.classList.remove("open-mobile");
     }
+  }
+
+  if (closeSidebarMobile) {
+    closeSidebarMobile.addEventListener("click", () => {
+      sidebar.classList.remove("open-mobile");
+    });
   }
 
   hamburgerButton.addEventListener("click", toggleSidebar);
@@ -68,208 +84,165 @@ function initListView() {
 
     listViewList.innerHTML = "";
 
-    if (mode === "saved" && sorted.length === 0) {
+    if (!sorted.length) {
       const empty = document.createElement("div");
-      empty.style.padding = "0.75rem";
-      empty.style.fontSize = "0.85rem";
-      empty.style.color = "#9ca3af";
+      empty.className = "list-empty-state";
       empty.textContent =
-        "You haven’t saved any places yet. Tap the ♡ icon on a place to save it.";
+        mode === "favorites"
+          ? "No saved places yet. Tap the heart on a place to save it."
+          : "No places match your filters or search. Try adjusting them.";
+      empty.style.padding = "0.75rem";
       listViewList.appendChild(empty);
+      return;
     }
-    
-sorted.forEach(({ place, index }) => {
-  const key = getPlaceKey(place, index);
 
-  const div = document.createElement("div");
-  div.className = "list-item";
-
-  /* -----------------------------
-     THUMBNAIL
-  ----------------------------- */
-  const thumb = document.createElement("div");
-  thumb.className = "list-thumb skeleton";
-
-  const img = document.createElement("img");
-  img.loading = "lazy";
-  img.classList.add("skeleton");
-
-  if (place.image_url) {
-    img.onload = () => {
-      img.classList.remove("skeleton");
-      thumb.classList.remove("skeleton");
-    };
-    img.src = place.image_url;
-  } else {
-    thumb.classList.remove("skeleton");
-  }
-
-  thumb.appendChild(img);
-  div.appendChild(thumb);
-
-  /* -----------------------------
-     RIGHT SIDE CONTENT
-  ----------------------------- */
-  const details = document.createElement("div");
-  details.className = "list-content";
-
-  /* TITLE ROW (title + heart) */
-  const titleRow = document.createElement("div");
-  titleRow.className = "list-title-row";
-
-  const titleEl = document.createElement("div");
-  titleEl.className = "list-title";
-  titleEl.textContent = place.title || "";
-
-  const favBtn = document.createElement("button");
-  favBtn.className = "list-fav-btn";
-  if (isFavorite(key)) favBtn.classList.add("fav-active");
-  favBtn.textContent = "♡";
-  favBtn.onclick = (e) => {
-    e.stopPropagation();
-    toggleFavorite(key);
-    favBtn.classList.toggle("fav-active", isFavorite(key));
-  };
-
-  titleRow.appendChild(titleEl);
-  titleRow.appendChild(favBtn);
-
-  /* META */
-  const metaEl = document.createElement("div");
-  metaEl.className = "list-meta";
-  metaEl.textContent = [place.category, place.region]
-    .filter(Boolean)
-    .join(" • ");
-
-  /* DESCRIPTION (ellipsis automatic) */
-  const descEl = document.createElement("div");
-  descEl.className = "list-desc";
-  descEl.textContent = place.description || "";
-
-  /* CONTENT STACK */
-  details.appendChild(titleRow);
-  details.appendChild(metaEl);
-  details.appendChild(descEl);
-
-  div.appendChild(details);
-
-  /* -----------------------------
-     CHEVRON
-  ----------------------------- */
-  const chevron = document.createElement("div");
-  chevron.className = "list-chevron";
-  chevron.textContent = "›";
-  div.appendChild(chevron);
-
-  /* -----------------------------
-     CLICK HANDLER (unchanged)
-  ----------------------------- */
-  div.onclick = () => {
-    const m = state.markers[index];
-    if (!m || !state.map) return;
-
-    state.map.setView(m.getLatLng(), 14);
-    highlightMarker(m);
-
-    if (window.innerWidth <= 768) {
-      const openEvt = new CustomEvent("place:openSheet", {
-        detail: { place, key, index },
-      });
-      window.dispatchEvent(openEvt);
-    } else {
-      m.fire("click");
-    }
-  };
-
-  listViewList.appendChild(div);
-});
-
-    if (listHeaderTitleEl) {
-      listHeaderTitleEl.textContent =
-        mode === "saved" ? "Saved places" : "Places list";
-    }
-  }
-
-  function openListView() {
-    renderListView(state.currentVisible, "all");
-    overlay.classList.add("open");
-  }
-
-  function openSavedView() {
-    const favs = getFavoriteKeys();
-    const saved = [];
-    state.places.forEach((place, index) => {
+    sorted.forEach(({ place, index }) => {
       const key = getPlaceKey(place, index);
-      if (favs.has(key)) saved.push({ place, index });
+      const item = document.createElement("button");
+      item.className = "list-item";
+
+      /* MAIN CONTAINER */
+      const content = document.createElement("div");
+      content.className = "list-item-content";
+
+      /* TITLE ROW + HEART */
+      const titleRow = document.createElement("div");
+      titleRow.className = "list-title-row";
+
+      const titleEl = document.createElement("div");
+      titleEl.className = "list-title";
+      titleEl.textContent = place.title || "";
+
+      const favBtn = document.createElement("button");
+      favBtn.className = "list-fav-btn";
+      if (isFavorite(key)) favBtn.classList.add("fav-active");
+      favBtn.textContent = "♡";
+      favBtn.onclick = (e) => {
+        e.stopPropagation();
+        toggleFavorite(key);
+        favBtn.classList.toggle("fav-active", isFavorite(key));
+      };
+
+      titleRow.appendChild(titleEl);
+      titleRow.appendChild(favBtn);
+
+      /* META */
+      const metaEl = document.createElement("div");
+      metaEl.className = "list-meta";
+      metaEl.textContent = [place.category, place.region]
+        .filter(Boolean)
+        .join(" • ");
+
+      /* DESCRIPTION (ellipsis automatic) */
+      const descEl = document.createElement("div");
+      descEl.className = "list-desc";
+      descEl.textContent = place.description || "";
+
+      /* CONTENT STACK */
+      details.appendChild(titleRow);
+      details.appendChild(metaEl);
+      details.appendChild(descEl);
+
+      content.appendChild(details);
+      item.appendChild(content);
+
+      item.addEventListener("click", () => {
+        const marker = state.markers[index];
+        if (marker) {
+          state.map.setView(marker.getLatLng(), 14);
+          highlightMarker(marker);
+
+          if (window.innerWidth <= 768) {
+            const evt = new CustomEvent("place:openSheet", {
+              detail: { place, key, index },
+            });
+            window.dispatchEvent(evt);
+          } else {
+            marker.fire("click");
+          }
+        }
+      });
+
+      listViewList.appendChild(item);
     });
-    renderListView(saved, "saved");
+  }
+
+  function openListViewAll() {
+    if (!overlay) return;
     overlay.classList.add("open");
+    overlay.setAttribute("aria-hidden", "false");
+    listHeaderTitleEl.textContent = "All places";
+    renderListView(state.filteredPlaces, "all");
+  }
+
+  function openListViewSaved() {
+    if (!overlay) return;
+    overlay.classList.add("open");
+    overlay.setAttribute("aria-hidden", "false");
+    listHeaderTitleEl.textContent = "Saved places";
+
+    const favorites = getFavoriteKeys();
+    const items = state.filteredPlaces.filter(({ place, index }) => {
+      const key = getPlaceKey(place, index);
+      return favorites.includes(key);
+    });
+
+    renderListView(items, "favorites");
   }
 
   function closeListView() {
+    if (!overlay) return;
     overlay.classList.remove("open");
+    overlay.setAttribute("aria-hidden", "true");
   }
 
-    function closeListView() {
-    overlay.classList.remove("open");
+  if (openListViewBtn) {
+    openListViewBtn.addEventListener("click", openListViewAll);
   }
 
-  /* <<< INSERT NEW CODE RIGHT HERE >>> */
-  window.addEventListener("filters:updated", () => {
-    if (!overlay.classList.contains("open")) return;
+  if (openSavedViewBtn) {
+    openSavedViewBtn.addEventListener("click", openListViewSaved);
+  }
 
-    const isSavedMode = listHeaderTitleEl?.textContent === "Saved places";
+  if (closeListViewBtn) {
+    closeListViewBtn.addEventListener("click", closeListView);
+  }
 
-    if (isSavedMode) {
-      const favs = getFavoriteKeys();
-      const saved = [];
-      state.places.forEach((place, index) => {
-        const key = getPlaceKey(place, index);
-        if (favs.has(key)) saved.push({ place, index });
-      });
-      renderListView(saved, "saved");
-    } else {
-      renderListView(state.currentVisible, "all");
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      closeListView();
     }
   });
-  
-  if (openListViewBtn) openListViewBtn.onclick = openListView;
-  if (closeListViewBtn) closeListViewBtn.onclick = closeListView;
-  if (openSavedViewBtn) openSavedViewBtn.onclick = openSavedView;
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeListView();
+    }
+  });
 }
 
-/* GPS Button */
+/* GPS button */
 function initGPSButton() {
   const gpsButton = document.getElementById("gpsButton");
-  if (!gpsButton || !state.map) return;
-
-  let userLocationMarker = null;
+  if (!gpsButton) return;
 
   gpsButton.addEventListener("click", () => {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser.");
       return;
     }
+
     gpsButton.classList.add("gps-active");
+
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        gpsButton.classList.remove("gps-active");
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-
-        if (!userLocationMarker) {
-          userLocationMarker = L.circleMarker([lat, lng], {
-            radius: 8,
-            fillColor: "#3B82F6",
-            fillOpacity: 1,
-            color: "#93C5FD",
-            weight: 3,
-          }).addTo(state.map);
-        } else {
-          userLocationMarker.setLatLng([lat, lng]);
+        const { latitude, longitude } = pos.coords;
+        if (state.map) {
+          const lat = latitude;
+          const lng = longitude;
+          state.map.setView([lat, lng], 13);
         }
-
-        state.map.setView([lat, lng], 13);
+        gpsButton.classList.remove("gps-active");
       },
       (err) => {
         gpsButton.classList.remove("gps-active");
@@ -299,13 +272,56 @@ function initPlaceSheet() {
 
   if (sheetImage) sheetImage.loading = "lazy";
 
+  let currentSheetState = SHEET_STATES.HIDDEN;
   let currentSheetKey = null;
 
-  function showPlaceSheet(place, key, index) {
-    placeSheet.classList.add("visible");
-    placeSheet.classList.remove("expanded");
-    placeSheet.style.transition = "transform 0.25s ease";
+  const STATE_CLASSES = [
+    "sheet-hidden",
+    "sheet-peek",
+    "sheet-half",
+    "sheet-full",
+  ];
+
+  function applySheetState(nextState) {
+    if (!placeSheet) return;
+
+    STATE_CLASSES.forEach((cls) => placeSheet.classList.remove(cls));
+
+    switch (nextState) {
+      case SHEET_STATES.PEEK:
+        placeSheet.classList.add("sheet-peek");
+        placeSheet.setAttribute("aria-hidden", "false");
+        document.body.classList.remove("sheet-open-full");
+        break;
+      case SHEET_STATES.HALF:
+        placeSheet.classList.add("sheet-half");
+        placeSheet.setAttribute("aria-hidden", "false");
+        document.body.classList.remove("sheet-open-full");
+        break;
+      case SHEET_STATES.FULL:
+        placeSheet.classList.add("sheet-full");
+        placeSheet.setAttribute("aria-hidden", "false");
+        document.body.classList.add("sheet-open-full");
+        break;
+      case SHEET_STATES.HIDDEN:
+      default:
+        placeSheet.classList.add("sheet-hidden");
+        placeSheet.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("sheet-open-full");
+        break;
+    }
+
+    currentSheetState = nextState;
+  }
+
+  function closeSheet() {
+    currentSheetKey = null;
+    applySheetState(SHEET_STATES.HIDDEN);
     placeSheet.style.transform = "";
+  }
+
+  function showPlaceSheet(place, key, index, opts = {}) {
+    const initialState = opts.state || SHEET_STATES.PEEK;
     currentSheetKey = key;
 
     if (sheetTitle) sheetTitle.textContent = place.title || "";
@@ -333,11 +349,13 @@ function initPlaceSheet() {
       place.maps_url ||
       place.google_url ||
       null;
+
     if (sheetMapsBtn) {
       if (url) {
         sheetMapsBtn.href = url;
-        sheetMapsBtn.style.display = "inline-block";
+        sheetMapsBtn.style.display = "inline-flex";
       } else {
+        sheetMapsBtn.removeAttribute("href");
         sheetMapsBtn.style.display = "none";
       }
     }
@@ -346,11 +364,20 @@ function initPlaceSheet() {
       if (isFavorite(key)) sheetFavBtn.classList.add("fav-active");
       else sheetFavBtn.classList.remove("fav-active");
     }
+
+    applySheetState(initialState);
   }
 
   if (sheetExpand) {
     sheetExpand.addEventListener("click", () => {
-      placeSheet.classList.add("expanded");
+      if (
+        currentSheetState === SHEET_STATES.PEEK ||
+        currentSheetState === SHEET_STATES.HALF
+      ) {
+        applySheetState(SHEET_STATES.FULL);
+      } else {
+        applySheetState(SHEET_STATES.PEEK);
+      }
     });
   }
 
@@ -393,9 +420,7 @@ function initPlaceSheet() {
     const delta = (currentY || dragStartY) - dragStartY;
 
     if (delta > 80) {
-      placeSheet.classList.remove("visible");
-      placeSheet.classList.remove("expanded");
-      placeSheet.style.transform = "";
+      closeSheet();
     } else {
       placeSheet.style.transform = "";
     }
@@ -417,6 +442,9 @@ function initPlaceSheet() {
     const { place, key, index } = e.detail;
     showPlaceSheet(place, key, index);
   });
+
+  // Optional global close event
+  window.addEventListener("place:closeSheet", () => {
+    closeSheet();
+  });
 }
-
-
