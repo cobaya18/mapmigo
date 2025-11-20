@@ -190,6 +190,7 @@ html, body {
   box-shadow: 0 14px 26px rgba(0,0,0,0.20);
   display: flex;
   flex-direction: column;
+  transition: transform 0.25s ease;
 }
 
 #sidebar.collapsed-desktop {
@@ -763,4 +764,5 @@ html, body {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
 
