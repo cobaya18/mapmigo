@@ -210,6 +210,29 @@ sorted.forEach(({ place, index }) => {
     overlay.classList.remove("open");
   }
 
+    function closeListView() {
+    overlay.classList.remove("open");
+  }
+
+  /* <<< INSERT NEW CODE RIGHT HERE >>> */
+  window.addEventListener("filters:updated", () => {
+    if (!overlay.classList.contains("open")) return;
+
+    const isSavedMode = listHeaderTitleEl?.textContent === "Saved places";
+
+    if (isSavedMode) {
+      const favs = getFavoriteKeys();
+      const saved = [];
+      state.places.forEach((place, index) => {
+        const key = getPlaceKey(place, index);
+        if (favs.has(key)) saved.push({ place, index });
+      });
+      renderListView(saved, "saved");
+    } else {
+      renderListView(state.currentVisible, "all");
+    }
+  });
+  
   if (openListViewBtn) openListViewBtn.onclick = openListView;
   if (closeListViewBtn) closeListViewBtn.onclick = closeListView;
   if (openSavedViewBtn) openSavedViewBtn.onclick = openSavedView;
@@ -395,4 +418,5 @@ function initPlaceSheet() {
     showPlaceSheet(place, key, index);
   });
 }
+
 
