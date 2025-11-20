@@ -1,6 +1,6 @@
 // js/core/fetch.js
 export async function loadPlacesFromAPI() {
-  const API_URL = "https://puerto-rico-map.cobaya18.workers.dev/places";
+  const API_URL = "https://mapmigo.mapmigo.workers.dev/places";
 
   const res = await fetch(API_URL);
   if (!res.ok) {
