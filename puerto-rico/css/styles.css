@@ -153,11 +153,6 @@ body {
   background: #f9fafb;
 }
 
-.topbar-btn {
-  padding: 0.35rem 0.6rem;
-  font-size: 0.75rem;
-}
-
 
 /* =====================================================================
    SEARCH RESULTS DROPDOWN (FLOATING)
@@ -843,4 +838,5 @@ body {
     background-position: -200% 0;
   }
 }
+
 
