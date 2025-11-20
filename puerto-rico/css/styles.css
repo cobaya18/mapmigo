@@ -124,20 +124,28 @@ html, body {
 /* =====================================================================
    SEARCH RESULTS DROPDOWN
 ===================================================================== */
+/* =====================================================================
+   SEARCH RESULTS DROPDOWN (PATCHED)
+===================================================================== */
+#searchBarWrapper {
+  position: relative; /* Anchor the dropdown to the search bar */
+}
+
 #searchResults {
-  position: fixed;
-  top: 3.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 12000;
+  position: absolute;
+  top: calc(100% + 0.45rem); /* Drop directly below the search bar */
+  left: 0;
+  width: 100%;
+  z-index: 20001;
+
   background: #ffffff;
   border-radius: 1rem;
   padding: 0.6rem;
-  min-width: min(480px, calc(100% - 2.2rem));
   border: 1px solid #e5e7eb;
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24);
+
   display: none;
-  max-height: calc(100vh - 8rem);
+  max-height: 280px;
   overflow-y: auto;
 }
 
@@ -771,3 +779,4 @@ html, body {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
