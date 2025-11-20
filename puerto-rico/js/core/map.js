@@ -3,7 +3,7 @@ import { state } from "./state.js";
 
 export function initMap() {
   const map = L.map("map", {
-    zoomControl: true,
+    zoomControl: false,
     zoomSnap: 0.25,
     zoomDelta: 0.5,
   }).setView([18.2208, -66.5901], 9);
@@ -98,3 +98,4 @@ export function initMap() {
 
   return map;
 }
+
