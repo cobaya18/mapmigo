@@ -127,16 +127,37 @@ body {
   gap: 0.4rem;
 }
 
-#topBarButtons button {
+#topBarButtons {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto; /* pushes buttons to the right */
+}
+
+.topbar-btn {
   border-radius: 999px;
-  border: none;
-  padding: 0.4rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  padding: 0.45rem 0.85rem;
   font-size: 0.8rem;
   cursor: pointer;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
+
+.topbar-btn:hover {
+  background: #f9fafb;
+}
+
+.topbar-btn {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.75rem;
+}
+
 
 /* =====================================================================
    SEARCH RESULTS DROPDOWN (FLOATING)
@@ -822,3 +843,4 @@ body {
     background-position: -200% 0;
   }
 }
+
