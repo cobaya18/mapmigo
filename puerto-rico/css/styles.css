@@ -322,35 +322,64 @@ body {
 }
 
 /* =====================================================================
-   MAP STYLE TOGGLE
+   MAP CONTROLS (UNIFIED)
 ===================================================================== */
-#mapStyleToggle {
+
+#mapControls {
   position: fixed;
   right: 0.9rem;
-  bottom: 5.9rem;
+  bottom: 1.2rem;
+  z-index: 11000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+/* shared floating style for all map controls */
+.floating-btn {
   background: #ffffff;
   border-radius: 999px;
   border: 1px solid #d1d5db;
+  width: 2.6rem;
+  height: 2.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #111827;
+  cursor: pointer;
+  box-shadow: 0 12px 26px rgba(0,0,0,0.30);
+  font-size: 1.2rem;
+}
+
+/* map style toggle as pill with icon + label */
+#mapStyleToggle {
   padding: 0.38rem 0.75rem;
+  width: auto;
+  min-width: 2.6rem;
   font-size: 0.85rem;
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  cursor: pointer;
-  z-index: 11000;
-  box-shadow: 0 12px 26px rgba(0,0,0,0.24);
 }
 
+.map-style-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* style menu anchored above the style toggle */
 #mapStyleMenu {
-  position: fixed;
-  right: 0.9rem;
-  bottom: 9.2rem;
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.45rem);
   background: #ffffff;
   border-radius: 0.75rem;
   padding: 0.3rem;
   border: 1px solid #d1d5db;
   display: none;
-  z-index: 11000;
+  z-index: 11001;
   box-shadow: 0 16px 30px rgba(0,0,0,0.32);
 }
 
@@ -367,6 +396,7 @@ body {
   font-size: 0.82rem;
   cursor: pointer;
   border: 1px solid transparent;
+  background: transparent;
 }
 
 .style-option.active {
@@ -374,27 +404,7 @@ body {
   border-color: #2563eb;
 }
 
-/* =====================================================================
-   GPS BUTTON
-===================================================================== */
-#gpsButton {
-  position: fixed;
-  right: 0.9rem;
-  bottom: 1.2rem;
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #111827;
-  cursor: pointer;
-  z-index: 11000;
-  box-shadow: 0 12px 26px rgba(0,0,0,0.30);
-}
-
+/* GPS: reuse floating-btn, keep pulse animation */
 #gpsButton.gps-active {
   animation: gpsPulse 1s ease-out infinite;
 }
@@ -408,10 +418,11 @@ body {
 /* =====================================================================
    LEAFLET POPUPS + MARKERS
 ===================================================================== */
+
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
   background: #ffffff;
- 	color: #111827;
+  color: #111827;
   border-radius: 1rem;
   border: 1px solid #e5e7eb;
   box-shadow: 0 20px 40px rgba(0,0,0,0.4);
@@ -514,6 +525,7 @@ body {
 /* =====================================================================
    LIST VIEW PANEL
 ===================================================================== */
+
 #listViewOverlay {
   position: fixed;
   top: 3.5rem;
@@ -565,7 +577,7 @@ body {
   gap: 0.55rem;
   background: #ffffff;
   border: 1px solid #e5e7eb;
- 	padding: 0.6rem;
+  padding: 0.6rem;
   border-radius: 0.9rem;
   margin-bottom: 0.6rem;
   cursor: pointer;
@@ -634,6 +646,7 @@ body {
 /* =====================================================================
    MOBILE PLACE SHEET
 ===================================================================== */
+
 .place-sheet {
   position: fixed;
   left: 0;
@@ -784,7 +797,7 @@ body {
 
   /* Search results dropdown — mobile */
   #searchResults {
-    max-height: 75vh;       /* Taller on mobile as requested (Option B) */
+    max-height: 75vh;       /* Taller on mobile */
     left: 0;
     right: 0;
     width: 100%;
