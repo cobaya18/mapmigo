@@ -45,6 +45,24 @@ export function initMap() {
   setBaseMap("Satellite");
 
   /* =====================================================
+     CUSTOM ZOOM BUTTONS
+  ===================================================== */
+  const zoomInBtn = document.getElementById("zoomInBtn");
+  const zoomOutBtn = document.getElementById("zoomOutBtn");
+
+  if (zoomInBtn) {
+    zoomInBtn.addEventListener("click", () => {
+      map.zoomIn();
+    });
+  }
+
+  if (zoomOutBtn) {
+    zoomOutBtn.addEventListener("click", () => {
+      map.zoomOut();
+    });
+  }
+
+  /* =====================================================
      MAP STYLE TOGGLE UI (Desktop + Mobile)
   ===================================================== */
   const mapStyleToggle = document.getElementById("mapStyleToggle");
@@ -88,14 +106,5 @@ export function initMap() {
     });
   }
 
-  /* =====================================================
-     MOVE ZOOM CONTROL (to avoid conflict with UI)
-  ===================================================== */
-  const zoomControl = map.zoomControl;
-  if (zoomControl) {
-    zoomControl.setPosition("topright");
-  }
-
   return map;
 }
-
