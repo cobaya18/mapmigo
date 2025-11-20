@@ -4,5 +4,10 @@ export const state = {
   places: [],
   markers: [],
   clusterGroup: null,
-  currentVisible: [], // [{ place, index }]
+
+  // [{ place, index }]
+  currentVisible: [],
+
+  // [{ place, index }] – kept in sync by filters.js for UI modules
+  filteredPlaces: [],
 };
