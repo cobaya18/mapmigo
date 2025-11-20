@@ -13,187 +13,142 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
   <!-- Leaflet CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <!-- MarkerCluster CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
-  />
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 
-  <!-- Custom Styles -->
-  <link rel="stylesheet" href="./styles.css" />
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="./css/styles.css" />
+
+  <style>
+    /* FIX: Ensure searchResults anchors under topBar */
+    #topBar {
+      position: relative;
+      z-index: 900; /* ensure it appears above map */
+    }
+    #searchResults {
+      position: absolute;
+      top: calc(100% + 0.45rem);
+      left: 0;
+      width: 100%;
+      z-index: 850;
+    }
+  </style>
 </head>
 
 <body>
-  <div id="appRoot">
-    <!-- TOP BAR -->
-    <header id="topBar">
-      <div id="logoArea">
-        <div id="logoEmoji">🗺️</div>
-        <div id="logoTextGroup">
-          <div id="logoTitle">MapMigo</div>
-          <div id="logoSubtitle">Puerto Rico</div>
-        </div>
-      </div>
 
-      <div id="searchArea">
-        <div id="searchBarWrapper">
-          <input
-            id="searchInput"
-            type="text"
-            placeholder="Search by name, city, category..."
-            autocomplete="off"
-          />
-          <button id="searchClearButton" class="icon-btn" aria-label="Clear search">
-            ✕
-          </button>
-        </div>
-        <!-- end searchBarWrapper -->
+<!-- TOP BAR -->
+<div id="topBar">
+  <button id="hamburgerButton" aria-label="Toggle filters">☰</button>
 
-        <!-- Search results overlay (moved inside topBar/searchArea) -->
-        <div id="searchResults">
-          <div class="search-results-header">
-            <span>Search results</span>
-            <button id="searchResultsClose" class="icon-btn" aria-label="Close search results">✕</button>
-          </div>
-          <div id="searchResultsList"></div>
-        </div>
-      </div>
+  <div id="searchBarWrapper">
+    <input id="search" placeholder="Search places…" aria-label="Search places" />
+    <button id="searchClear" aria-label="Clear search">✕</button>
+    <button id="searchButton" aria-label="Search">🔍</button>
+  </div>
 
-      <div id="topBarButtons">
-        <button id="filtersButton" class="primary-btn" aria-label="Open filters">
-          Filters
-        </button>
-        <button id="favoritesButton" class="icon-btn" aria-label="View favorites">
-          ★
-        </button>
-        <button id="listViewButton" class="icon-btn only-desktop" aria-label="Open list view">
-          ☰
-        </button>
-      </div>
-    </header>
+  <div id="topBarButtons">
+    <button id="openSavedView" aria-label="Open saved places">Saved</button>
+    <button id="openListView" aria-label="Open list view">List View</button>
+  </div>
+</div>
 
-    <!-- MAIN LAYOUT -->
-    <div id="layoutRoot">
-      <!-- SIDEBAR (filters + favorites) -->
-      <aside id="sidebar">
-        <div id="sidebarScroll">
-          <section class="sidebar-section">
-            <div class="sidebar-section-header">
-              <h2>Filters</h2>
-              <button id="clearFiltersButton" class="text-btn">Clear all</button>
-            </div>
+  <!-- SEARCH RESULTS DROPDOWN -->
+  <div id="searchResults">
+    <div class="search-results-header">Search results</div>
+    <div id="searchResultsList"></div>
+  </div>
 
-            <div class="sidebar-subsection">
-              <h3>Categories</h3>
-              <div id="categoryFilters" class="chip-group"></div>
-            </div>
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sidebar-handle"></div>
 
-            <div class="sidebar-subsection">
-              <h3>Regions</h3>
-              <div id="regionFilters" class="chip-group"></div>
-            </div>
-          </section>
-
-          <section class="sidebar-section">
-            <div class="sidebar-section-header">
-              <h2>Favorites</h2>
-              <button id="clearFavoritesButton" class="text-btn">
-                Clear
-              </button>
-            </div>
-            <div id="favoritesEmptyState" class="empty-state">
-              <div class="empty-emoji">⭐</div>
-              <div class="empty-title">No favorites yet</div>
-              <div class="empty-body">
-                Tap the star on any place to save it here.
-              </div>
-            </div>
-            <div id="favoritesList" class="place-list"></div>
-          </section>
-        </div>
-      </aside>
-
-      <!-- SIDEBAR OVERLAY (mobile) -->
-      <div id="sidebarOverlay"></div>
-
-      <!-- MAP AREA -->
-      <main id="mapArea">
-        <div id="mapContainer">
-          <div id="map"></div>
-
-          <!-- Map controls -->
-          <div id="mapControls">
-            <button id="gpsButton" class="floating-btn" aria-label="Locate me">
-              📍
-            </button>
-
-            <div id="mapStyleControl" class="floating-dropdown">
-              <button id="mapStyleButton" class="floating-btn" aria-label="Map style">
-                🗺
-              </button>
-              <div id="mapStyleMenu" class="floating-menu">
-                <button data-style-id="streets">Streets</button>
-                <button data-style-id="satellite">Satellite</button>
-                <button data-style-id="outdoors">Outdoors</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Map skeleton loader -->
-          <div id="mapSkeleton" class="map-skeleton">
-            <div class="skeleton-header"></div>
-            <div class="skeleton-lines"></div>
-          </div>
-        </div>
-      </main>
+    <div class="sidebar-header">
+      <div class="sidebar-header-title">Filters</div>
     </div>
 
-    <!-- LIST VIEW OVERLAY -->
-    <div id="listViewOverlay">
-      <div id="listViewSheet">
-        <header id="listViewHeader">
-          <button id="listViewCloseButton" class="icon-btn" aria-label="Close list view">
-            ✕
-          </button>
-          <div class="list-view-title-group">
-            <h2>Places</h2>
-            <div id="listViewCount" class="list-count"></div>
-          </div>
-        </header>
+    <div id="infoBar">Loading places…</div>
 
-        <div id="listViewContent">
-          <div id="listViewEmptyState" class="empty-state">
-            <div class="empty-emoji">🔍</div>
-            <div class="empty-title">No places to show</div>
-            <div class="empty-body">
-              Try adjusting your search or filters.
-            </div>
-          </div>
-          <div id="listViewPlaces" class="place-list"></div>
-        </div>
-      </div>
+    <div class="filter-group">
+      <h4>Filter by Category</h4>
+      <div id="categoryButtons" class="filter-buttons"></div>
     </div>
 
-    <!-- MOBILE PLACE SHEET -->
-    <div id="mobilePlaceSheet">
-      <div id="mobileSheetHandle"></div>
-      <div id="mobileSheetContent"></div>
+    <div class="filter-group">
+      <h4>Filter by Region</h4>
+      <div id="regionButtons" class="filter-buttons"></div>
+    </div>
+
+    <div class="filter-group filter-group-reset">
+      <button id="resetFiltersSidebar" class="reset-filters-btn">Reset Filters</button>
     </div>
   </div>
 
-  <!-- App entry -->
-  <script type="module" src="./app.js"></script>
+  <!-- MAP -->
+  <div id="map"></div>
+
+  <!-- MAP STYLE TOGGLE -->
+  <button id="mapStyleToggle">
+    <span class="icon">🛰️</span>
+    <span>Map</span>
+  </button>
+
+  <div id="mapStyleMenu">
+    <button class="style-option active" data-theme="Satellite">
+      <span class="icon">🛰️</span><span>Satellite</span>
+    </button>
+    <button class="style-option" data-theme="Dark">
+      <span class="icon">⬛</span><span>Dark</span>
+    </button>
+    <button class="style-option" data-theme="Light">
+      <span class="icon">◻️</span><span>Light</span>
+    </button>
+  </div>
+
+  <!-- GPS BUTTON -->
+  <button id="gpsButton" title="Find my location">📍</button>
+
+  <!-- LIST VIEW OVERLAY -->
+  <div id="listViewOverlay" class="closed">
+    <div class="list-header">
+      <div id="listHeaderTitle" class="list-header-title">Places list</div>
+      <button id="closeListView">Close</button>
+    </div>
+    <div id="listViewList"></div>
+  </div>
+
+  <!-- MOBILE PLACE SHEET -->
+  <div id="placeSheet" class="place-sheet">
+    <div class="sheet-handle"></div>
+
+    <div class="place-sheet-inner">
+      <div id="sheetPreview">
+        <div class="sheet-title-row">
+          <div id="sheetTitle"></div>
+          <button id="sheetFavBtn">♡</button>
+        </div>
+        <div id="sheetMeta"></div>
+        <button id="sheetExpand">Expand</button>
+      </div>
+
+      <div id="sheetDetails">
+        <img id="sheetImage" alt="" />
+        <p id="sheetDescription"></p>
+        <a id="sheetMapsBtn" target="_blank" href="#">Open in Google Maps</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- MarkerCluster JS -->
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+  <!-- Main App (ES module) -->
+  <script type="module" src="./js/app.js"></script>
 
   <!-- Service worker -->
   <script>
