@@ -15,121 +15,128 @@
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="./css/styles.css" />
+  <!-- MarkerCluster CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="./css/styles.css" />
 </head>
+
 <body>
 
-  <!-- ================================
-       TOP BAR + SEARCH
-     ================================ -->
-  <div id="topBar">
-    
-    <!-- SEARCH BAR -->
-    <div id="searchBarWrapper">
-      <input id="search" placeholder="Search places…" aria-label="Search places" />
-      <button id="searchClear" aria-label="Clear search">✕</button>
-      <button id="searchButton" aria-label="Search">🔍</button>
+<!-- TOP BAR -->
+<div id="topBar">
+  <button id="hamburgerButton" aria-label="Toggle filters">☰</button>
 
-      <!-- SEARCH RESULTS DROPDOWN (FIXED & MOVED INSIDE TOPBAR) -->
-      <div id="searchResults" style="display: none;">
-        <div class="search-results-header">Search results</div>
-        <div id="searchResultsList"></div>
-      </div>
-    </div>
-
-    <!-- RIGHT BUTTONS -->
-    <div id="topBarButtons">
-      <button id="openSavedView">❤️</button>
-      <button id="openListView">📋</button>
-    </div>
+  <div id="searchBarWrapper">
+    <input id="search" placeholder="Search places…" aria-label="Search places" />
+    <button id="searchClear" aria-label="Clear search">✕</button>
+    <button id="searchButton" aria-label="Search">🔍</button>
   </div>
 
-  <!-- ================================
-       SIDEBAR (FILTERS)
-     ================================ -->
+  <div id="topBarButtons">
+    <button id="openSavedView" aria-label="Open saved places">Saved</button>
+    <button id="openListView" aria-label="Open list view">List View</button>
+  </div>
+</div>
+
+  <!-- SEARCH RESULTS DROPDOWN -->
+  <div id="searchResults">
+    <div class="search-results-header">Search results</div>
+    <div id="searchResultsList"></div>
+  </div>
+
+  <!-- SIDEBAR -->
   <div id="sidebar">
     <div class="sidebar-handle"></div>
 
     <div class="sidebar-header">
       <div class="sidebar-header-title">Filters</div>
+      <!-- Saved button removed from here -->
     </div>
 
     <div id="infoBar">Loading places…</div>
 
-    <!-- Category filters -->
     <div class="filter-group">
       <h4>Filter by Category</h4>
-      <div class="filter-buttons" id="categoryFilters"></div>
+      <div id="categoryButtons" class="filter-buttons"></div>
     </div>
 
-    <!-- Region filters -->
     <div class="filter-group">
       <h4>Filter by Region</h4>
-      <div class="filter-buttons" id="regionFilters"></div>
+      <div id="regionButtons" class="filter-buttons"></div>
     </div>
 
-    <button class="reset-filters-btn" id="resetFilters">Reset Filters</button>
+    <div class="filter-group filter-group-reset">
+      <button id="resetFiltersSidebar" class="reset-filters-btn">Reset Filters</button>
+    </div>
   </div>
 
-  <!-- ================================
-       LIST VIEW OVERLAY
-     ================================ -->
-  <div id="listViewOverlay">
+  <!-- MAP -->
+  <div id="map"></div>
+
+  <!-- MAP STYLE TOGGLE -->
+  <button id="mapStyleToggle">
+    <span class="icon">🛰️</span>
+    <span>Map</span>
+  </button>
+
+  <div id="mapStyleMenu">
+    <button class="style-option active" data-theme="Satellite">
+      <span class="icon">🛰️</span><span>Satellite</span>
+    </button>
+    <button class="style-option" data-theme="Dark">
+      <span class="icon">⬛</span><span>Dark</span>
+    </button>
+    <button class="style-option" data-theme="Light">
+      <span class="icon">◻️</span><span>Light</span>
+    </button>
+  </div>
+
+  <!-- GPS BUTTON -->
+  <button id="gpsButton" title="Find my location">📍</button>
+
+  <!-- LIST VIEW OVERLAY -->
+  <div id="listViewOverlay" class="closed">
     <div class="list-header">
-      <div class="list-header-title">All Places</div>
-      <button id="closeListView">✕</button>
+      <div id="listHeaderTitle" class="list-header-title">Places list</div>
+      <button id="closeListView">Close</button>
     </div>
     <div id="listViewList"></div>
   </div>
 
-  <!-- ================================
-       MOBILE PLACE SHEET
-     ================================ -->
-  <div class="place-sheet" id="placeSheet">
+  <!-- MOBILE PLACE SHEET -->
+  <div id="placeSheet" class="place-sheet">
     <div class="sheet-handle"></div>
-    <div class="place-sheet-inner">
 
+    <div class="place-sheet-inner">
       <div id="sheetPreview">
         <div class="sheet-title-row">
-          <div id="sheetTitle">Title</div>
+          <div id="sheetTitle"></div>
           <button id="sheetFavBtn">♡</button>
         </div>
         <div id="sheetMeta"></div>
+        <button id="sheetExpand">Expand</button>
       </div>
-
-      <button id="sheetExpand">Expand</button>
 
       <div id="sheetDetails">
-        <img id="sheetImage" src="" alt="" />
-        <div id="sheetDescription"></div>
-        <a id="sheetMapsBtn" href="#" target="_blank">Open in Maps</a>
+        <img id="sheetImage" alt="" />
+        <p id="sheetDescription"></p>
+        <a id="sheetMapsBtn" target="_blank" href="#">Open in Google Maps</a>
       </div>
-
     </div>
   </div>
 
-  <!-- ================================
-       MAP CONTAINER
-     ================================ -->
-  <div id="map"></div>
-
-  <!-- MAP STYLE TOGGLE -->
-  <button id="mapStyleToggle">🗺️ Map Style</button>
-  <div id="mapStyleMenu"></div>
-
-  <!-- GPS BUTTON -->
-  <button id="gpsButton">📍</button>
-
-  <!-- ================================
-       SCRIPTS
-     ================================ -->
+  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- MarkerCluster JS -->
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
+  <!-- Main App (ES module) -->
   <script type="module" src="./js/app.js"></script>
 
-  <!-- PWA Service Worker -->
+  <!-- Service worker -->
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
