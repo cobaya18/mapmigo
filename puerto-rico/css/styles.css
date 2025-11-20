@@ -61,7 +61,8 @@ html, body {
 
 #hamburgerButton,
 #openListView,
-#openSavedView {
+#openSavedView,
+#closeListView {
   pointer-events: auto;
   border: 1px solid #d4d4d8;
   background: #ffffff;
@@ -386,7 +387,7 @@ html, body {
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
   background: #ffffff;
-  color: #111827;
+ 	color: #111827;
   border-radius: 1rem;
   border: 1px solid #e5e7eb;
   box-shadow: 0 20px 40px rgba(0,0,0,0.4);
@@ -502,7 +503,7 @@ html, body {
   z-index: 10500;
   overflow: hidden;
 
-  /* New for animation */
+  /* Animation */
   transform: translateX(110%);
   opacity: 0;
   pointer-events: none;
@@ -515,13 +516,13 @@ html, body {
   pointer-events: auto;
 }
 
-
 .list-header {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid #e5e7eb;
   background: #f9fafb;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .list-header-title {
@@ -540,7 +541,7 @@ html, body {
   gap: 0.55rem;
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  padding: 0.6rem;
+ 	padding: 0.6rem;
   border-radius: 0.9rem;
   margin-bottom: 0.6rem;
   cursor: pointer;
@@ -569,6 +570,12 @@ html, body {
 
 .list-details {
   flex: 1;
+}
+
+.list-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .list-title {
@@ -764,5 +771,3 @@ html, body {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
-
-
