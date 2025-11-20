@@ -150,6 +150,7 @@ export function applyFilters(queryText = "") {
   }
 
   updateInfoBar(visible.length, activeCats, activeRegs);
+  window.dispatchEvent(new CustomEvent("filters:updated"));
 }
 
 function updateInfoBar(visibleCount, activeCats, activeRegs) {
@@ -169,3 +170,4 @@ function updateInfoBar(visibleCount, activeCats, activeRegs) {
 
   infoBar.textContent = parts.join(" • ");
 }
+
