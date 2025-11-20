@@ -77,87 +77,112 @@ function initListView() {
         "You haven’t saved any places yet. Tap the ♡ icon on a place to save it.";
       listViewList.appendChild(empty);
     }
+    
+sorted.forEach(({ place, index }) => {
+  const key = getPlaceKey(place, index);
 
-    sorted.forEach(({ place, index }) => {
-      const key = getPlaceKey(place, index);
-      const div = document.createElement("div");
-      div.className = "list-item";
+  const div = document.createElement("div");
+  div.className = "list-item";
 
-      const thumb = document.createElement("div");
-      thumb.className = "list-thumb skeleton";
+  /* -----------------------------
+     THUMBNAIL
+  ----------------------------- */
+  const thumb = document.createElement("div");
+  thumb.className = "list-thumb skeleton";
 
-      const img = document.createElement("img");
-      if (place.image_url) {
-        img.loading = "lazy";
-        img.classList.add("skeleton");
-        img.onload = () => {
-          img.classList.remove("skeleton");
-          thumb.classList.remove("skeleton");
-        };
-        img.src = place.image_url;
-      } else {
-        thumb.classList.remove("skeleton");
-      }
-      thumb.appendChild(img);
+  const img = document.createElement("img");
+  img.loading = "lazy";
+  img.classList.add("skeleton");
 
-      const details = document.createElement("div");
-      details.className = "list-details";
+  if (place.image_url) {
+    img.onload = () => {
+      img.classList.remove("skeleton");
+      thumb.classList.remove("skeleton");
+    };
+    img.src = place.image_url;
+  } else {
+    thumb.classList.remove("skeleton");
+  }
 
-      const titleRow = document.createElement("div");
-      titleRow.className = "list-title-row";
+  thumb.appendChild(img);
+  div.appendChild(thumb);
 
-      const titleEl = document.createElement("div");
-      titleEl.className = "list-title";
-      titleEl.textContent = place.title || "";
+  /* -----------------------------
+     RIGHT SIDE CONTENT
+  ----------------------------- */
+  const details = document.createElement("div");
+  details.className = "list-content";
 
-      const favBtn = document.createElement("button");
-      favBtn.className = "list-fav-btn";
-      if (isFavorite(key)) favBtn.classList.add("fav-active");
-      favBtn.textContent = "♡";
-      favBtn.onclick = (e) => {
-        e.stopPropagation();
-        toggleFavorite(key);
-        if (isFavorite(key)) favBtn.classList.add("fav-active");
-        else favBtn.classList.remove("fav-active");
-      };
+  /* TITLE ROW (title + heart) */
+  const titleRow = document.createElement("div");
+  titleRow.className = "list-title-row";
 
-      titleRow.appendChild(titleEl);
-      titleRow.appendChild(favBtn);
+  const titleEl = document.createElement("div");
+  titleEl.className = "list-title";
+  titleEl.textContent = place.title || "";
 
-      const metaEl = document.createElement("div");
-      metaEl.className = "list-meta";
-      metaEl.textContent = [place.category, place.region]
-        .filter(Boolean)
-        .join(" • ");
+  const favBtn = document.createElement("button");
+  favBtn.className = "list-fav-btn";
+  if (isFavorite(key)) favBtn.classList.add("fav-active");
+  favBtn.textContent = "♡";
+  favBtn.onclick = (e) => {
+    e.stopPropagation();
+    toggleFavorite(key);
+    favBtn.classList.toggle("fav-active", isFavorite(key));
+  };
 
-      const descEl = document.createElement("div");
-      descEl.className = "list-desc";
-      descEl.textContent = place.description || "";
+  titleRow.appendChild(titleEl);
+  titleRow.appendChild(favBtn);
 
-      details.appendChild(titleRow);
-      details.appendChild(metaEl);
-      details.appendChild(descEl);
+  /* META */
+  const metaEl = document.createElement("div");
+  metaEl.className = "list-meta";
+  metaEl.textContent = [place.category, place.region]
+    .filter(Boolean)
+    .join(" • ");
 
-      div.appendChild(thumb);
-      div.appendChild(details);
+  /* DESCRIPTION (ellipsis automatic) */
+  const descEl = document.createElement("div");
+  descEl.className = "list-desc";
+  descEl.textContent = place.description || "";
 
-      div.onclick = () => {
-        const m = state.markers[index];
-        if (!m || !state.map) return;
-        state.map.setView(m.getLatLng(), 14);
-        highlightMarker(m);
-        if (window.innerWidth <= 768) {
-          const openEvt = new CustomEvent("place:openSheet", {
-            detail: { place, key, index },
-          });
-          window.dispatchEvent(openEvt);
-        } else {
-          m.fire("click");
-        }
-      };
+  /* CONTENT STACK */
+  details.appendChild(titleRow);
+  details.appendChild(metaEl);
+  details.appendChild(descEl);
 
-      listViewList.appendChild(div);
-    });
+  div.appendChild(details);
+
+  /* -----------------------------
+     CHEVRON
+  ----------------------------- */
+  const chevron = document.createElement("div");
+  chevron.className = "list-chevron";
+  chevron.textContent = "›";
+  div.appendChild(chevron);
+
+  /* -----------------------------
+     CLICK HANDLER (unchanged)
+  ----------------------------- */
+  div.onclick = () => {
+    const m = state.markers[index];
+    if (!m || !state.map) return;
+
+    state.map.setView(m.getLatLng(), 14);
+    highlightMarker(m);
+
+    if (window.innerWidth <= 768) {
+      const openEvt = new CustomEvent("place:openSheet", {
+        detail: { place, key, index },
+      });
+      window.dispatchEvent(openEvt);
+    } else {
+      m.fire("click");
+    }
+  };
+
+  listViewList.appendChild(div);
+});
 
     if (listHeaderTitleEl) {
       listHeaderTitleEl.textContent =
@@ -370,3 +395,4 @@ function initPlaceSheet() {
     showPlaceSheet(place, key, index);
   });
 }
+
