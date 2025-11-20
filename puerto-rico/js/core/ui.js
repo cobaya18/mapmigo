@@ -167,7 +167,7 @@ function initListView() {
 
   function openListView() {
     renderListView(state.currentVisible, "all");
-    overlay.style.display = "block";
+    overlay.classList.add("open");
   }
 
   function openSavedView() {
@@ -178,11 +178,11 @@ function initListView() {
       if (favs.has(key)) saved.push({ place, index });
     });
     renderListView(saved, "saved");
-    overlay.style.display = "block";
+    overlay.classList.add("open");
   }
 
   function closeListView() {
-    overlay.style.display = "none";
+    overlay.classList.remove("open");
   }
 
   if (openListViewBtn) openListViewBtn.onclick = openListView;
