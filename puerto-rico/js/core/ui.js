@@ -75,8 +75,14 @@ function initListView() {
 
   if (!overlay || !listViewList) return;
 
-  function renderListView(items, mode = "all") {
-    const sorted = [...items].sort((a, b) =>
+ function renderListView(items, mode = "all") {
+  if (!items || !Array.isArray(items)) {
+    // fallback empty state
+    listViewList.innerHTML = "<div class='list-empty-state' style='padding:0.75rem;'>No places loaded.</div>";
+    return;
+  }
+
+  const sorted = [...items].sort((a, b) =>
       (a.place.title || "").localeCompare(b.place.title || "", "en", {
         sensitivity: "base",
       })
@@ -448,3 +454,4 @@ function initPlaceSheet() {
     closeSheet();
   });
 }
+
