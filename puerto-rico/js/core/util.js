@@ -1,6 +1,7 @@
 // js/core/util.js
-export function normalize(str = "") {
-  return str
+export function normalize(str) {
+  if (str == null) return ""; // <-- FIX: handles null, undefined
+  return String(str)
     .toLowerCase()
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
@@ -45,7 +46,9 @@ const categoryColorMap = {
 };
 
 export function getCategoryColor(c = "") {
+  if (!c) return "#3B82F6"; // fallback
   if (categoryColorMap[c]) return categoryColorMap[c];
+
   const n = c.toLowerCase();
   if (n.includes("beach")) return "#00C8FF";
   if (n.includes("night")) return "#FF1493";
@@ -81,7 +84,9 @@ const categoryEmojiMap = {
 };
 
 export function getCategoryEmoji(c = "") {
+  if (!c) return "📍"; // fallback
   if (categoryEmojiMap[c]) return categoryEmojiMap[c];
+
   const n = c.toLowerCase();
   if (n.includes("beach")) return "🏖️";
   if (n.includes("night")) return "🎵";
