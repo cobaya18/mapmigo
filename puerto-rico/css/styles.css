@@ -1,37 +1,56 @@
 /* =====================================================================
-   GLOBAL RESET / BASE
+   ROOT / GLOBAL
 ===================================================================== */
-* {
+
+:root {
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --surface-soft: #f9fafb;
+  --border-subtle: #e5e7eb;
+  --border-strong: #d1d5db;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --danger: #b91c1c;
+
+  --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-strong: 0 16px 40px rgba(0, 0, 0, 0.24);
+}
+
+/* Global reset */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #f3f4f6;
-  color: #111827;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text-main);
+}
+
+body {
   overflow: hidden;
 }
 
-/* Custom variable for mobile 100vh fix */
-:root {
-  --vh: 1vh;
-}
+/* =====================================================================
+   MAIN LAYOUT
+===================================================================== */
 
-/* Map should fill the window */
 #map {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
+  z-index: 1;
 }
 
-/* =====================================================================
-   TOP BAR
-===================================================================== */
+/* TOP BAR */
 #topBar {
   position: fixed;
   top: 0.6rem;
@@ -45,7 +64,19 @@ html, body {
   min-height: 3.1rem; /* Prevent collapse */
 }
 
-/* SEARCH BAR — 320px width */
+/* Hamburger */
+#hamburgerButton {
+  pointer-events: auto;
+  border: none;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 0.45rem 0.65rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+/* SEARCH BAR — 320px width on desktop */
 #searchBarWrapper {
   pointer-events: auto;
   flex: 0 0 320px;
@@ -57,83 +88,63 @@ html, body {
   padding: 0.3rem 0.45rem;
   border: 1px solid #e5e7eb;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+  position: relative; /* anchor for floating dropdown */
 }
 
-#hamburgerButton,
-#openListView,
-#openSavedView,
-#closeListView {
-  pointer-events: auto;
-  border: 1px solid #d4d4d8;
-  background: #ffffff;
-  color: #111827;
-  padding: 0.48rem 0.75rem;
-  border-radius: 999px;
-  cursor: pointer;
-  font-size: 0.92rem;
-  min-width: 2.4rem;
-  min-height: 2.4rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
-}
-
-/* RIGHT-ALIGNED BUTTONS: Saved then List View */
-#topBarButtons {
-  display: flex;
-  flex-direction: row;
-  gap: 0.45rem;
-  pointer-events: auto;
-  margin-left: auto;
-}
-
-/* =====================================================================
-   SEARCH BAR INPUT
-===================================================================== */
 #search {
   flex: 1;
   border: none;
   outline: none;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.4rem;
   background: transparent;
-  color: #111827;
-  font-size: 0.95rem;
-  padding: 0.45rem 0.6rem;
+}
+
+#search::placeholder {
+  color: #9ca3af;
 }
 
 #searchClear,
 #searchButton {
   border: none;
   background: transparent;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 999px;
+  cursor: pointer;
+  padding: 0.2rem 0.35rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+#searchClear:hover,
+#searchButton:hover {
+  color: #111827;
+}
+
+/* TOP BAR BUTTONS */
+#topBarButtons {
+  pointer-events: auto;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.4rem;
+}
+
+#topBarButtons button {
+  border-radius: 999px;
+  border: none;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
   cursor: pointer;
-  flex-shrink: 0;
-  color: #4b5563;
-  font-size: 1rem;
-}
-
-#searchClear {
-  display: none;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
 }
 
 /* =====================================================================
-   SEARCH RESULTS DROPDOWN
+   SEARCH RESULTS DROPDOWN (FLOATING)
 ===================================================================== */
-/* =====================================================================
-   SEARCH RESULTS DROPDOWN (PATCHED)
-===================================================================== */
-#searchBarWrapper {
-  position: relative; /* Anchor the dropdown to the search bar */
-}
 
 #searchResults {
   position: absolute;
-  top: calc(100% + 0.45rem); /* Drop directly below the search bar */
+  top: calc(100% + 0.45rem); /* Drops directly below the search bar */
   left: 0;
   width: 100%;
   z-index: 20001;
@@ -144,9 +155,10 @@ html, body {
   border: 1px solid #e5e7eb;
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24);
 
-  display: none;
-  max-height: 280px;
+  display: none;              /* Shown via JS when there are results */
+  max-height: 40vh;           /* Desktop max height */
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .search-results-header {
@@ -165,16 +177,20 @@ html, body {
   transition: 0.15s ease;
 }
 
+.result-item:last-child {
+  margin-bottom: 0;
+}
+
 .result-item:hover {
   background: #ffffff;
   border-color: #d1d5db;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
 }
 
 .result-title {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #111827;
+  margin-bottom: 0.1rem;
 }
 
 .result-meta {
@@ -185,6 +201,7 @@ html, body {
 /* =====================================================================
    SIDEBAR (Filters)
 ===================================================================== */
+
 #sidebar {
   position: fixed;
   top: 4.9rem;
@@ -192,11 +209,10 @@ html, body {
   width: 320px; /* <-- Keeping sidebar width at 320px */
   height: calc(100vh - 5.8rem);
   background: #ffffff;
-  border-radius: 1rem;
-  z-index: 10000;
-  border: 1px solid #e5e7eb;
-  padding: 0.75rem 0.9rem;
-  box-shadow: 0 14px 26px rgba(0,0,0,0.20);
+  border-radius: 1.25rem;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  z-index: 1000;
+  padding: 0.9rem 0.9rem 1rem;
   display: flex;
   flex-direction: column;
   transition: transform 0.25s ease;
@@ -732,8 +748,9 @@ html, body {
 }
 
 /* =====================================================================
-   MOBILE OVERRIDES
+   RESPONSIVE (MOBILE)
 ===================================================================== */
+
 @media (max-width: 768px) {
 
   #sidebar {
@@ -764,19 +781,31 @@ html, body {
     flex: 1;
     max-width: none; /* Full width on mobile */
   }
+
+  /* Search results dropdown — mobile */
+  #searchResults {
+    max-height: 75vh;       /* Taller on mobile as requested (Option B) */
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
 }
 
 /* =====================================================================
    SKELETON
 ===================================================================== */
+
 .skeleton {
   background: linear-gradient(90deg, #e5e7eb, #f3f4f6, #e5e7eb);
   background-size: 200% 100%;
-  animation: skeletonAnim 1.2s infinite linear;
+  animation: skeleton-loading 1.2s ease-in-out infinite;
 }
 
-@keyframes skeletonAnim {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
-
