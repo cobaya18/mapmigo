@@ -903,6 +903,17 @@ body {
     right: 0;
     width: 100%;
   }
+
+   /* Completely hide the mobile place sheet on desktop */
+@media (min-width: 769px) {
+  #placeSheet {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(100%) !important;
+    position: fixed !important;
+  }
 }
 
 /* =====================================================================
@@ -937,6 +948,7 @@ body {
     background-position: -200% 0;
   }
 }
+
 
 
 
