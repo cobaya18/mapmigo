@@ -13,29 +13,25 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
 
   <!-- MarkerCluster CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+  />
 
   <!-- Main CSS -->
   <link rel="stylesheet" href="./css/styles.css" />
-
-  <style>
-    /* FIX: Ensure searchResults anchors under topBar */
-    #topBar {
-      position: relative;
-      z-index: 900; /* ensure it appears above map */
-    }
-    #searchResults {
-      position: absolute;
-      top: calc(100% + 0.45rem);
-      left: 0;
-      width: 100%;
-      z-index: 850;
-    }
-  </style>
 </head>
 
 <body>
@@ -48,6 +44,11 @@
     <input id="search" placeholder="Search places…" aria-label="Search places" />
     <button id="searchClear" aria-label="Clear search">✕</button>
     <button id="searchButton" aria-label="Search">🔍</button>
+
+    <!-- SEARCH RESULTS DROPDOWN -->
+    <div id="searchResults" aria-label="Search results" role="listbox">
+      <div id="searchResultsList"></div>
+    </div>
   </div>
 
   <div id="topBarButtons">
@@ -55,12 +56,6 @@
     <button id="openListView" aria-label="Open list view">List View</button>
   </div>
 </div>
-
-  <!-- SEARCH RESULTS DROPDOWN -->
-  <div id="searchResults">
-    <div class="search-results-header">Search results</div>
-    <div id="searchResultsList"></div>
-  </div>
 
   <!-- SIDEBAR -->
   <div id="sidebar">
@@ -144,6 +139,7 @@
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <!-- MarkerCluster JS -->
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
