@@ -1,0 +1,65 @@
+Copyright © 2025 MapMigo. All Rights Reserved.
+
+All original content included in this project—such as the source code,
+JavaScript modules, HTML, CSS, styling, layout, design system, user interface,
+animations, branding elements, data structures, curated place data,
+descriptions, categories, regions, and API formatting—is the exclusive
+intellectual property of MapMigo and its owner.
+
+No part of this project may be:
+
+• copied
+• reproduced
+• modified
+• distributed
+• sublicensed
+• sold
+• reverse engineered
+• publicly displayed
+• incorporated into another website or application
+• used for commercial or non-commercial purposes
+
+— without prior written permission from MapMigo.
+
+------------------------------------
+THIRD-PARTY COMPONENTS
+------------------------------------
+This project uses open-source libraries and external services such as:
+
+• Leaflet
+• Leaflet MarkerCluster
+• Esri / ArcGIS tiles
+• OpenStreetMap tiles
+• Cloudflare Worker serverless infrastructure
+• Other third-party dependencies
+
+These components retain their original licenses, which are NOT overridden,
+restricted, or modified by this LICENSE. Users of MapMigo must comply with the
+licenses of those third-party components separately.
+
+------------------------------------
+EXTERNAL IMAGES & MEDIA
+------------------------------------
+MapMigo displays images sourced from external URLs. All rights to externally
+hosted images remain with their respective copyright holders. MapMigo does not
+claim ownership over any externally hosted media and does not store copyrighted
+images on its own servers.
+
+------------------------------------
+TRADEMARKS & BRANDING
+------------------------------------
+The name "MapMigo," associated logos, icons, graphics, and branding elements
+are proprietary and may not be used without written authorization.
+
+------------------------------------
+NO WARRANTY
+------------------------------------
+This project is provided “as is” without any warranty of any kind, express or
+implied. MapMigo is not liable for any damages arising from the use or inability
+to use this project.
+
+------------------------------------
+CONTACT
+------------------------------------
+For licensing inquiries or permissions, contact:
+support@mapmigo.app
