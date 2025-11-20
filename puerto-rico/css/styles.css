@@ -877,7 +877,7 @@ body {
 
   #mobileFilterHandle {
     position: fixed;
-    bottom: 0.35rem;
+    bottom: calc(env(safe-area-inset-bottom) + 1rem);
     left: 50%;
     transform: translateX(-50%);
     width: 64px;
