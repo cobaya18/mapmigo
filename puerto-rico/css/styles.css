@@ -679,10 +679,15 @@ body {
 }
 
 .list-desc {
-  font-size: 0.78rem;
-  color: #4b5563;
-  max-height: 2.8em;
+  font-size: 0.82rem;
+  color: #374151;
+  line-height: 1.3;
+  max-height: 2.6em;
   overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 /* =====================================================================
@@ -864,6 +869,7 @@ body {
     background-position: -200% 0;
   }
 }
+
 
 
 
