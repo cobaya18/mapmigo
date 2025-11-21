@@ -2,63 +2,73 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>MapMigo — Explore Smarter</title>
+  <title>MapMigo — Rediscover home. Explore somewhere new.</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
+    :root {
+      --primary: #2563eb;
+      --dark: #0f172a;
+      --text: #111827;
+      --subtle: #6b7280;
+      --surface: #ffffff;
+      --gray-bg: #f3f4f6;
+    }
+
     body {
       margin: 0;
       padding: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f3f4f6;
-      color: #111827;
+      background: var(--gray-bg);
+      color: var(--text);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
     header {
-      padding: 1.6rem;
+      padding: 1.8rem;
       text-align: center;
-    }
-
-    .logo {
-      font-size: 2rem;
       font-weight: 700;
+      font-size: 2rem;
       letter-spacing: -0.5px;
-      color: #111827;
+      color: var(--dark);
     }
 
     .hero {
       text-align: center;
-      padding: 4rem 1rem 3rem;
-      flex: 1;
+      padding: 4.5rem 1.2rem 3.2rem;
+      max-width: 720px;
+      margin: 0 auto;
     }
 
     .hero h1 {
-      font-size: clamp(1.9rem, 4vw, 2.6rem);
-      margin-bottom: 1rem;
-      color: #111827;
-      font-weight: 700;
+      font-size: clamp(2.1rem, 4vw, 3rem);
+      margin-bottom: 1.1rem;
+      font-weight: 800;
+      line-height: 1.15;
+      color: var(--dark);
     }
 
     .hero p {
-      font-size: 1.05rem;
-      color: #6b7280;
-      max-width: 520px;
-      margin: 0 auto 2rem;
-      line-height: 1.55;
+      font-size: 1.08rem;
+      line-height: 1.6;
+      color: var(--subtle);
+      max-width: 560px;
+      margin: 0 auto 2.2rem;
     }
 
     .cta-button {
       display: inline-block;
-      padding: 0.85rem 1.6rem;
-      background: #2563eb;
+      padding: 0.9rem 1.8rem;
+      background: var(--primary);
       color: #ffffff;
       text-decoration: none;
       border-radius: 999px;
-      font-size: 1rem;
-      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+      font-size: 1.05rem;
+      font-weight: 600;
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.25);
       transition: background 0.2s, transform 0.15s;
     }
 
@@ -67,44 +77,73 @@
       transform: translateY(-2px);
     }
 
-    .regions {
-      margin-top: 3rem;
+    /* --- Manifesto Section --- */
+    .manifesto {
+      margin-top: 4rem;
+      padding: 0 1.2rem;
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
       text-align: center;
+    }
+
+    .manifesto p {
+      font-size: 1.05rem;
+      color: var(--subtle);
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    /* --- Regions --- */
+    .regions {
+      margin-top: 4rem;
+      text-align: center;
+      padding-bottom: 3rem;
     }
 
     .regions-title {
       font-size: 1rem;
-      margin-bottom: 0.9rem;
+      margin-bottom: 1.1rem;
       color: #374151;
       font-weight: 600;
+      letter-spacing: 0.3px;
     }
 
     .region-grid {
       display: flex;
-      gap: 0.75rem;
+      gap: 0.9rem;
       justify-content: center;
       flex-wrap: wrap;
+      padding: 0 1rem;
     }
 
     .region-card {
-      background: #ffffff;
-      border-radius: 0.75rem;
-      padding: 0.9rem 1.4rem;
+      background: var(--surface);
+      border-radius: 0.9rem;
+      padding: 1rem 1.5rem;
       border: 1px solid #e5e7eb;
-      font-size: 0.9rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--text);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .region-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
     }
 
     footer {
       text-align: center;
-      padding: 1.2rem;
-      font-size: 0.78rem;
-      color: #6b7280;
+      padding: 1.4rem;
+      font-size: 0.8rem;
+      color: var(--subtle);
       margin-top: auto;
     }
 
     footer a {
-      color: #2563eb;
+      color: var(--primary);
       text-decoration: none;
     }
 
@@ -116,19 +155,29 @@
 
 <body>
 
-  <header>
-    <div class="logo">MapMigo</div>
-  </header>
+  <!-- Logo / Header -->
+  <header>MapMigo</header>
 
+  <!-- Hero -->
   <div class="hero">
-    <h1>Discover Places, Explore Smarter</h1>
+    <h1>Rediscover home. Explore somewhere new.</h1>
     <p>
-      MapMigo helps you find the best beaches, viewpoints, hikes, food spots,
-      and hidden gems — with a clean interface, smart filters, and an interactive map.
+      A cleaner, smarter way to find beaches, trails, hidden gems, food spots,
+      and places worth experiencing — all through a simple, powerful, clutter-free map.
     </p>
     <a class="cta-button" href="/puerto-rico/">Explore Puerto Rico →</a>
   </div>
 
+  <!-- Manifesto Section -->
+  <div class="manifesto">
+    <p>
+      We built MapMigo to make exploring simple again.
+      Your map amigo — cutting the clutter and organizing great places so you
+      can rediscover home or explore somewhere new.
+    </p>
+  </div>
+
+  <!-- Regions -->
   <div class="regions">
     <div class="regions-title">Available Regions</div>
     <div class="region-grid">
@@ -138,9 +187,10 @@
     </div>
   </div>
 
+  <!-- Footer -->
   <footer>
-    © 2025 MapMigo. All Rights Reserved.  
-    | <a href="/LICENSE">License</a>  
+    © 2025 MapMigo. All Rights Reserved.
+    | <a href="/LICENSE">License</a>
     | <a href="/legal/">Legal</a>
   </footer>
 
