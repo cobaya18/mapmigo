@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MapMigo — Puerto Rico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- PWA / Icons -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#f3f4f6">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
+
+  <!-- MarkerCluster CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+  />
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div id="topBar">
+  <button id="hamburgerButton" aria-label="Toggle filters">☰</button>
+
+  <div id="searchBarWrapper">
+    <input id="search" placeholder="Search places…" aria-label="Search places" />
+    <button id="searchClear" aria-label="Clear search">✕</button>
+    <button id="searchButton" aria-label="Search">🔍</button>
+
+    <!-- SEARCH RESULTS DROPDOWN -->
+    <div id="searchResults" aria-label="Search results" role="listbox">
+      <div id="searchResultsList"></div>
+    </div>
+  </div>
+
+  <!-- UPDATED BUTTONS TO THE RIGHT -->
+  <div id="topBarButtons">
+    <button id="openSavedView" class="topbar-btn" aria-label="Open saved places">⭐ Saved</button>
+    <button id="openListView" class="topbar-btn" aria-label="Open list view">📋 List View</button>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="sidebar-handle"></div>
+
+  <div class="sidebar-header">
+    <div class="sidebar-header-title">Filters</div>
+  </div>
+
+  <div id="infoBar">Loading places…</div>
+
+  <div class="filter-group">
+    <h4>Filter by Category</h4>
+    <div id="categoryButtons" class="filter-buttons"></div>
+  </div>
+
+  <div class="filter-group">
+    <h4>Filter by Region</h4>
+    <div id="regionButtons" class="filter-buttons"></div>
+  </div>
+
+  <div class="filter-group filter-group-reset">
+    <button id="resetFiltersSidebar" class="reset-filters-btn">Reset Filters</button>
+  </div>
+</div>
+
+<!-- MAP -->
+<div id="map"></div>
+
+<!-- UNIFIED MAP CONTROLS -->
+<div id="mapControls">
+  id="zoomInBtn" class="floating-btn">＋</button>
+  id="zoomOutBtn" class="floating-btn">－</button>
+  <button id="gpsButton" class="floating-btn">📍</button>
+  <div class="map-style-group">
+    <button id="mapStyleToggle" class="floating-btn">
+      <span class="icon">🛰️</span>
+      <span>Map</span>
+    </button>
+
+    <div id="mapStyleMenu" class="floating-menu">
+      <button class="style-option active" data-theme="Satellite">🛰 Satellite</button>
+      <button class="style-option" data-theme="Dark">⬛ Dark</button>
+      <button class="style-option" data-theme="Light">◻️ Light</button>
+    </div>
+</div>
+  </div>
+  <button id="gpsButton" class="floating-btn">📍</button>
+</div>
+
+<!-- LIST VIEW -->
+<div id="listViewOverlay" class="closed">
+  <div class="list-sheet-handle"></div>
+  <div class="list-header">
+    <div id="listHeaderTitle" class="list-header-title">Places list</div><button id="closeListView" class="close-btn">Close</button>
+    
+  </div>
+  <div id="listViewList"></div>
+</div>
+
+
+<!-- MOBILE FILTER SHEET -->
+<div id="filterSheet" class="place-sheet filter-sheet">
+  <div class="peek-drag-area"></div>
+  <div class="place-sheet-inner filter-sheet-inner">
+    <div class="filter-sheet-header" style="flex-direction:column;align-items:center;text-align:center;">
+      <div class="filter-drag-handle"></div>
+      <div class="filter-sheet-title">Filters</div>
+    </div>
+    <div class="filter-sheet-body">
+      <div class="filter-group">
+        <h4>Filter by Category</h4>
+        <div id="sheetCategoryButtons" class="filter-buttons"></div>
+      </div>
+      <div class="filter-group">
+        <h4>Filter by Region</h4>
+        <div id="sheetRegionButtons" class="filter-buttons"></div>
+      </div>
+      <div class="filter-group filter-group-reset">
+        <button id="resetFiltersSheet" class="reset-filters-btn" type="button">
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE PLACE SHEET -->
+<div id="placeSheet" class="place-sheet">
+  <div class="sheet-handle"></div>
+
+  <div class="place-sheet-inner">
+    <div id="sheetPreview">
+      <div class="sheet-title-row">
+        <div id="sheetTitle"></div>
+        <button id="sheetFavBtn">♡</button>
+      </div>
+      <div id="sheetMeta"></div>
+      <button id="sheetExpand">Expand</button>
+    </div>
+
+    <div id="sheetDetails">
+      <img id="sheetImage" alt="" />
+      <p id="sheetDescription"></p>
+      <a id="sheetMapsBtn" target="_blank" href="#">Open in Google Maps</a>
+    </div>
+  </div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- MarkerCluster JS (correct file) -->
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+<!-- Main App (ES module) -->
+<script type="module" src="./js/app.js"></script>
+
+</body>
+</html>
