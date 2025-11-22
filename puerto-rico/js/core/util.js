@@ -30,42 +30,49 @@ export function relevanceScore(place, q) {
 }
 
 const categoryColorMap = {
-  Beach: "#00C8FF",
-  Entertainment: "#FF0080",
-  Food: "#FF6B00",
-  Hiking: "#2DD4BF",
+  Beach: "#3CB9FF",
+  Entertainment: "#D946EF",
+  Food: "#F97316",
+  Hiking: "#34D399",
   "Historical Landmark": "#8B5CF6",
-  Museum: "#3F51B5",
-  Nightlife: "#FF1493",
-  "Park/Nature": "#4CAF50",
-  "Point of Interest": "#FFD400",
-  "River/Waterfall": "#0096C7",
-  Shopping: "#FFB703",
-  "Tour/Activity": "#3B82F6",
-  Viewpoint: "#E11D48",
+  Museum: "#6366F1",
+  Nightlife: "#EC4899",
+  "Park/Nature": "#22C55E",
+  "Point of Interest": "#FBBF24",
+  "River/Waterfall": "#0EA5E9",
+  Shopping: "#F59E0B",
+  "Tour/Activity": "#2563EB",
+  Viewpoint: "#EF4444",
 };
 
 export function getCategoryColor(c = "") {
   if (!c) return "#3B82F6"; // fallback
   if (categoryColorMap[c]) return categoryColorMap[c];
 
+export function getCategoryColor(c = "") {
+  if (!c) return "#2563EB"; // default (Tour Blue)
+
+  if (categoryColorMap[c]) return categoryColorMap[c];
+
   const n = c.toLowerCase();
-  if (n.includes("beach")) return "#00C8FF";
-  if (n.includes("night")) return "#FF1493";
-  if (n.includes("food") || n.includes("restaurant")) return "#FF6B00";
-  if (n.includes("park") || n.includes("nature")) return "#4CAF50";
-  if (n.includes("hike")) return "#2DD4BF";
-  if (n.includes("view")) return "#E11D48";
-  if (n.includes("museum")) return "#3F51B5";
+  if (n.includes("beach")) return "#3CB9FF";
+  if (n.includes("night")) return "#EC4899";
+  if (n.includes("food") || n.includes("restaurant")) return "#F97316";
+  if (n.includes("park") || n.includes("nature")) return "#22C55E";
+  if (n.includes("hike")) return "#34D399";
+  if (n.includes("view")) return "#EF4444";
+  if (n.includes("museum")) return "#6366F1";
   if (n.includes("historic") || n.includes("landmark")) return "#8B5CF6";
-  if (n.includes("shop")) return "#FFB703";
-  if (n.includes("entertainment")) return "#FF0080";
-  if (n.includes("tour") || n.includes("activity")) return "#3B82F6";
+  if (n.includes("shop")) return "#F59E0B";
+  if (n.includes("entertainment")) return "#D946EF";
+  if (n.includes("tour") || n.includes("activity")) return "#2563EB";
   if (n.includes("water") || n.includes("river") || n.includes("falls"))
-    return "#0096C7";
-  if (n.includes("point")) return "#FFD400";
-  return "#3B82F6";
+    return "#0EA5E9";
+  if (n.includes("point")) return "#FBBF24";
+
+  return "#2563EB";
 }
+
 
 const categoryEmojiMap = {
   Beach: "🏖️",
@@ -110,4 +117,5 @@ export function getPlaceKey(place, index) {
   if (place.slug) return "slug:" + place.slug;
   return "idx:" + index + ":" + (place.title || "");
 }
+
 
