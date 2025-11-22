@@ -78,141 +78,125 @@ function initListView() {
         "You haven’t saved any places yet. Tap the ♡ icon on a place to save it.";
       listViewList.appendChild(empty);
     }
-    
-sorted.forEach(({ place, index }) => {
-  const key = getPlaceKey(place, index);
 
-  const div = document.createElement("div");
-  div.className = "list-item";
+    sorted.forEach(({ place, index }) => {
+      const key = getPlaceKey(place, index);
 
-  /* -----------------------------
-     THUMBNAIL
-  ----------------------------- */
-  const thumb = document.createElement("div");
-  thumb.className = "list-thumb skeleton";
+      const div = document.createElement("div");
+      div.className = "list-item";
 
-  const img = document.createElement("img");
-  img.loading = "lazy";
-  img.classList.add("skeleton");
+      /* THUMBNAIL */
+      const thumb = document.createElement("div");
+      thumb.className = "list-thumb skeleton";
 
-  if (place.image_url) {
-    img.onload = () => {
-      img.classList.remove("skeleton");
-      thumb.classList.remove("skeleton");
-    };
-    img.src = place.image_url;
-  } else {
-    thumb.classList.remove("skeleton");
-  }
+      const img = document.createElement("img");
+      img.loading = "lazy";
+      img.classList.add("skeleton");
 
-  thumb.appendChild(img);
-  div.appendChild(thumb);
+      if (place.image_url) {
+        img.onload = () => {
+          img.classList.remove("skeleton");
+          thumb.classList.remove("skeleton");
+        };
+        img.src = place.image_url;
+      } else {
+        thumb.classList.remove("skeleton");
+      }
 
-  /* -----------------------------
-     RIGHT SIDE CONTENT
-  ----------------------------- */
-  const details = document.createElement("div");
-  details.className = "list-content";
+      thumb.appendChild(img);
+      div.appendChild(thumb);
 
-  /* TITLE ROW (title + heart) */
-  const titleRow = document.createElement("div");
-  titleRow.className = "list-title-row";
+      /* RIGHT CONTENT */
+      const details = document.createElement("div");
+      details.className = "list-content";
 
-  const titleEl = document.createElement("div");
-  titleEl.className = "list-title";
-  titleEl.textContent = place.title || "";
+      const titleRow = document.createElement("div");
+      titleRow.className = "list-title-row";
 
-  const favBtn = document.createElement("button");
-  favBtn.className = "list-fav-btn";
-  if (isFavorite(key)) favBtn.classList.add("fav-active");
-  favBtn.textContent = "♡";
-  favBtn.onclick = (e) => {
-    e.stopPropagation();
-    toggleFavorite(key);
-    favBtn.classList.toggle("fav-active", isFavorite(key));
-  };
+      const titleEl = document.createElement("div");
+      titleEl.className = "list-title";
+      titleEl.textContent = place.title || "";
 
-  titleRow.appendChild(titleEl);
-  titleRow.appendChild(favBtn);
+      const favBtn = document.createElement("button");
+      favBtn.className = "list-fav-btn";
+      if (isFavorite(key)) favBtn.classList.add("fav-active");
+      favBtn.textContent = "♡";
+      favBtn.onclick = (e) => {
+        e.stopPropagation();
+        toggleFavorite(key);
+        favBtn.classList.toggle("fav-active", isFavorite(key));
+      };
 
-  /* META */
-  const metaEl = document.createElement("div");
-  metaEl.className = "list-meta";
+      titleRow.appendChild(titleEl);
+      titleRow.appendChild(favBtn);
 
-  const category = place.category || "";
-  const region = place.region || "";
+      const metaEl = document.createElement("div");
+      metaEl.className = "list-meta";
 
-  if (category) {
-    const colorChip = document.createElement("span");
-    colorChip.className = "list-meta-color";
-    try {
-      colorChip.style.backgroundColor = getCategoryColor(category);
-    } catch (e) {
-      // fallback – leave default
-    }
-    metaEl.appendChild(colorChip);
+      const category = place.category || "";
+      const region = place.region || "";
 
-    const catSpan = document.createElement("span");
-    catSpan.className = "list-meta-category";
-    catSpan.textContent = category;
-    metaEl.appendChild(catSpan);
-  }
+      if (category) {
+        const colorChip = document.createElement("span");
+        colorChip.className = "list-meta-color";
+        try {
+          colorChip.style.backgroundColor = getCategoryColor(category);
+        } catch (e) {}
+        metaEl.appendChild(colorChip);
 
-  if (category && region) {
-    const sep = document.createElement("span");
-    sep.textContent = " • ";
-    metaEl.appendChild(sep);
-  }
+        const catSpan = document.createElement("span");
+        catSpan.className = "list-meta-category";
+        catSpan.textContent = category;
+        metaEl.appendChild(catSpan);
+      }
 
-  if (region) {
-    const regSpan = document.createElement("span");
-    regSpan.className = "list-meta-region";
-    regSpan.textContent = region;
-    metaEl.appendChild(regSpan);
-  }
+      if (category && region) {
+        const sep = document.createElement("span");
+        sep.textContent = " • ";
+        metaEl.appendChild(sep);
+      }
 
-  /* DESCRIPTION (ellipsis automatic) */
-  const descEl = document.createElement("div");
-  descEl.className = "list-desc";
-  descEl.textContent = place.description || "";
+      if (region) {
+        const regSpan = document.createElement("span");
+        regSpan.className = "list-meta-region";
+        regSpan.textContent = region;
+        metaEl.appendChild(regSpan);
+      }
 
-  /* CONTENT STACK */
-  details.appendChild(titleRow);
-  details.appendChild(metaEl);
-  details.appendChild(descEl);
+      const descEl = document.createElement("div");
+      descEl.className = "list-desc";
+      descEl.textContent = place.description || "";
 
-  div.appendChild(details);
+      details.appendChild(titleRow);
+      details.appendChild(metaEl);
+      details.appendChild(descEl);
 
-  /* -----------------------------
-     CHEVRON
-  ----------------------------- */
-  const chevron = document.createElement("div");
-  chevron.className = "list-chevron";
-  chevron.textContent = "›";
-  div.appendChild(chevron);
+      div.appendChild(details);
 
-  /* -----------------------------
-     CLICK HANDLER (unchanged)
-  ----------------------------- */
-  div.onclick = () => {
-    const m = state.markers[index];
-    if (!m || !state.map) return;
+      const chevron = document.createElement("div");
+      chevron.className = "list-chevron";
+      chevron.textContent = "›";
+      div.appendChild(chevron);
 
-    state.map.setView(m.getLatLng(), 14);
-    highlightMarker(m);
+      div.onclick = () => {
+        const m = state.markers[index];
+        if (!m || !state.map) return;
 
-    if (window.innerWidth <= 768) {
-      const openEvt = new CustomEvent("place:openSheet", {
-        detail: { place, key, index },
-      });
-      window.dispatchEvent(openEvt);
-    } else {
-      m.fire("click");
-    }
-  };
+        state.map.setView(m.getLatLng(), 14);
+        highlightMarker(m);
 
-  listViewList.appendChild(div);
-});
+        if (window.innerWidth <= 768) {
+          const openEvt = new CustomEvent("place:openSheet", {
+            detail: { place, key, index },
+          });
+          window.dispatchEvent(openEvt);
+        } else {
+          m.fire("click");
+        }
+      };
+
+      listViewList.appendChild(div);
+    });
 
     if (listHeaderTitleEl) {
       listHeaderTitleEl.textContent =
@@ -240,7 +224,6 @@ sorted.forEach(({ place, index }) => {
     overlay.classList.remove("open");
   }
 
-  // Drag-to-close behavior for mobile list bottom sheet
   const listSheetHandle = overlay.querySelector(".list-sheet-handle");
   const isMobileListSheet = () => window.innerWidth <= 768;
 
@@ -272,7 +255,6 @@ sorted.forEach(({ place, index }) => {
       dragging = false;
       const delta = (currentY || dragStartY) - dragStartY;
 
-      // Restore transition so future opens/closes animate
       overlay.style.transition = "transform 0.25s ease, opacity 0.25s ease";
 
       if (delta > 80) {
@@ -287,17 +269,21 @@ sorted.forEach(({ place, index }) => {
       currentY = null;
     }
 
-    listSheetHandle.addEventListener("touchstart", handleListTouchStart, { passive: true });
-    listSheetHandle.addEventListener("touchmove", handleListTouchMove, { passive: true });
+    listSheetHandle.addEventListener("touchstart", handleListTouchStart, {
+      passive: true,
+    });
+    listSheetHandle.addEventListener("touchmove", handleListTouchMove, {
+      passive: true,
+    });
     listSheetHandle.addEventListener("touchend", handleListTouchEnd);
     listSheetHandle.addEventListener("touchcancel", handleListTouchEnd);
   }
 
-  /* <<< INSERT NEW CODE RIGHT HERE >>> */
   window.addEventListener("filters:updated", () => {
     if (!overlay.classList.contains("open")) return;
 
-    const isSavedMode = listHeaderTitleEl?.textContent === "Saved places";
+    const isSavedMode =
+      listHeaderTitleEl?.textContent === "Saved places";
 
     if (isSavedMode) {
       const favs = getFavoriteKeys();
@@ -311,7 +297,7 @@ sorted.forEach(({ place, index }) => {
       renderListView(state.currentVisible, "all");
     }
   });
-  
+
   if (openListViewBtn) openListViewBtn.onclick = openListView;
   if (closeListViewBtn) closeListViewBtn.onclick = closeListView;
   if (openSavedViewBtn) openSavedViewBtn.onclick = openSavedView;
@@ -367,14 +353,9 @@ function initPlaceSheet() {
 
   const sheetTitle = document.getElementById("sheetTitle");
   const sheetMeta = document.getElementById("sheetMeta");
-  const sheetExpand = document.getElementById("sheetExpand");
   const sheetDetails = document.getElementById("sheetDetails");
   const sheetImage = document.getElementById("sheetImage");
   const sheetDesc = document.getElementById("sheetDescription");
-    document.getElementById("sheetWebsite").innerHTML = place.website_url ? `<a href="${place.website_url}" target="_blank">${place.website_url}</a>` : "N/A";
-    document.getElementById("sheetCost").textContent = place.cost || "N/A";
-    document.getElementById("sheetParking").textContent = place.parking || "N/A";
-    document.getElementById("sheetMunicipality").textContent = place.municipality || "N/A";
   const sheetMapsBtn = document.getElementById("sheetMapsBtn");
   const sheetHandle = placeSheet.querySelector(".sheet-handle");
   const sheetPreview = document.getElementById("sheetPreview");
@@ -384,6 +365,7 @@ function initPlaceSheet() {
 
   let currentSheetKey = null;
 
+  /* FIXED VERSION — mobile info added here */
   function showPlaceSheet(place, key, index) {
     placeSheet.classList.add("visible");
     placeSheet.classList.remove("expanded");
@@ -398,6 +380,21 @@ function initPlaceSheet() {
         .join(" • ");
     }
     if (sheetDesc) sheetDesc.textContent = place.description || "";
+
+    /* >>> INSERTED MOBILE INFO BLOCK <<< */
+    const w = document.getElementById("sheetWebsite");
+    const c = document.getElementById("sheetCost");
+    const p = document.getElementById("sheetParking");
+    const m = document.getElementById("sheetMunicipality");
+
+    if (w)
+      w.innerHTML = place.website_url
+        ? `<a href="${place.website_url}" target="_blank">${place.website_url}</a>`
+        : "N/A";
+    if (c) c.textContent = place.cost || "N/A";
+    if (p) p.textContent = place.parking || "N/A";
+    if (m) m.textContent = place.municipality || "N/A";
+    /* >>> END INSERT <<< */
 
     if (sheetImage) {
       if (place.image_url) {
@@ -431,18 +428,11 @@ function initPlaceSheet() {
     }
   }
 
-  if (sheetExpand) {
-    sheetExpand.addEventListener("click", () => {
-      placeSheet.classList.add("expanded");
-    });
-  }
-
   if (sheetFavBtn) {
     sheetFavBtn.addEventListener("click", () => {
       if (!currentSheetKey) return;
       toggleFavorite(currentSheetKey);
-      if (isFavorite(currentSheetKey)) sheetFavBtn.classList.add("fav-active");
-      else sheetFavBtn.classList.remove("fav-active");
+      sheetFavBtn.classList.toggle("fav-active", isFavorite(currentSheetKey));
     });
   }
 
@@ -495,15 +485,11 @@ function initPlaceSheet() {
     el.addEventListener("touchcancel", sheetTouchEnd);
   });
 
-  // Listen for openSheet events from markers/search/list
   window.addEventListener("place:openSheet", (e) => {
     const { place, key, index } = e.detail;
     showPlaceSheet(place, key, index);
   });
 }
-
-
-
 
 function initFilterSheet() {
   const filterSheet = document.getElementById("filterSheet");
@@ -528,10 +514,8 @@ function initFilterSheet() {
 
   if (!sheetHandle) return;
 
-  // Tap the peek area to open
   sheetHandle.addEventListener("click", openSheet);
 
-  // Drag-to-open / drag-to-close on mobile
   let dragStartY = null;
   let currentY = null;
   let dragging = false;
