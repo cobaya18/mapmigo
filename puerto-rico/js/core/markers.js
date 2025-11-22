@@ -1,0 +1,284 @@
+// js/core/markers.js
+import { state } from "./state.js";
+import {
+  getCategoryColor,
+  getCategoryEmoji,
+  getPlaceKey,
+} from "./util.js";
+import {
+  isFavorite,
+  toggleFavorite,
+} from "./favorites.js";
+
+let highlightRing = null;
+let popupFavHandlerInitialized = false;
+
+/* ============================================================
+   GLOBAL DELEGATED HANDLER FOR POPUP FAVORITE BUTTONS
+============================================================ */
+function initPopupFavoriteHandler() {
+  if (popupFavHandlerInitialized) return;
+  popupFavHandlerInitialized = true;
+
+  document.addEventListener("click", (evt) => {
+    const btn = evt.target.closest(".leaflet-popup .fav-btn");
+    if (!btn) return;
+
+    evt.stopPropagation();
+
+    const key = btn.dataset.key;
+    if (!key) return;
+
+    toggleFavorite(key);
+    btn.classList.toggle("fav-active", isFavorite(key));
+  });
+}
+
+export function initMarkers() {
+  if (!state.map) throw new Error("Map not initialized");
+
+  const isMobile = () => window.innerWidth <= 768;
+
+  /* ============================================================
+     GLOBAL MOBILE POPUP DISABLER (NUCLEAR FIX)
+     This removes *all* Leaflet popup capability on mobile.
+  ============================================================ */
+  if (isMobile()) {
+    L.Map.prototype.openPopup = function () { return this; };
+    L.Popup.prototype.openOn = function () { return this; };
+  } else {
+    // Desktop only: set up global handler for popup favorite buttons
+    initPopupFavoriteHandler();
+  }
+
+  /* ============================================================
+     CLUSTER GROUP
+  ============================================================ */
+  const clusterGroup = L.markerClusterGroup({
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: !isMobile(), // disable zoom-popup on mobile
+    spiderfyOnEveryClick: true,
+    disableClusteringAtZoom: 10,
+    maxClusterRadius: 50,
+  });
+
+  // MOBILE: Disable cluster popups fully
+  if (isMobile()) {
+    clusterGroup.off("clusterclick");
+    clusterGroup.on("clusterclick", (e) => {
+      // Only spiderfy, NEVER open a popup
+      e.layer.spiderfy();
+      if (e.originalEvent) {
+        e.originalEvent.preventDefault();
+        e.originalEvent.stopPropagation();
+      }
+    });
+  }
+
+  state.clusterGroup = clusterGroup;
+  state.markers = [];
+
+  /* ============================================================
+     CREATE MARKERS
+  ============================================================ */
+  state.places.forEach((place, index) => {
+    const lat = Number(place.latitude);
+    const lng = Number(place.longitude);
+    if (!lat || !lng) {
+      state.markers.push(null);
+      return;
+    }
+
+    const marker = L.marker([lat, lng], {
+      icon: createMarkerIcon(place.category),
+    });
+
+    const key = getPlaceKey(place, index);
+    const gmapUrl =
+      place.google_maps_url ||
+      place.map_url ||
+      place.maps_url ||
+      place.google_url ||
+      null;
+
+    /* ============================================================
+       POPUP BUILD
+    ============================================================ */
+    const popupHtml = buildPopupHtml(place, key, gmapUrl);
+
+    /* ============================================================
+       DESKTOP MODE — popups work normally
+    ============================================================ */
+    if (!isMobile()) {
+      // Disable sanitization so Leaflet does not strip heart / data attributes
+      marker.bindPopup(popupHtml, { sanitize: false });
+
+      marker.on("click", () => {
+        highlightMarker(marker);
+        marker.openPopup();
+      });
+    }
+
+    /* ============================================================
+       MOBILE MODE — NO POPUPS EVER
+       Clicking marker opens bottom sheet only.
+    ============================================================ */
+    if (isMobile()) {
+      marker.unbindPopup();
+      marker.off("popupopen");
+      marker.closePopup();
+
+      marker.on("click", () => {
+        highlightMarker(marker);
+
+        const evt = new CustomEvent("place:openSheet", {
+          detail: { place, key, index },
+        });
+
+        window.dispatchEvent(evt);
+      });
+    }
+
+    /* Marker selection highlight (both desktop + mobile) */
+    marker.on("click", () => {
+      document
+        .querySelectorAll(".marker-pin")
+        .forEach((el) => el.classList.remove("marker-pin-selected"));
+
+      const pin = marker._icon?.querySelector(".marker-pin");
+      if (pin) pin.classList.add("marker-pin-selected");
+    });
+
+    clusterGroup.addLayer(marker);
+    state.markers.push(marker);
+  });
+
+  /* ============================================================
+     LAST LINE OF DEFENSE:
+     If ANY popup attempts to open on mobile → kill it instantly.
+  ============================================================ */
+  if (isMobile()) {
+    state.map.on("popupopen", (e) => {
+      e.popup._close();
+    });
+  }
+
+  state.map.addLayer(clusterGroup);
+}
+
+/* ============================================================
+   MARKER ICON
+============================================================ */
+function createMarkerIcon(category) {
+  const color = getCategoryColor(category);
+  const emoji = getCategoryEmoji(category);
+
+  return L.divIcon({
+    className: "custom-marker",
+    html: `
+      <div class="marker-pin" style="background:${color}">
+        <span class="marker-emoji">${emoji}</span>
+      </div>
+    `,
+    iconSize: [26, 36],
+    iconAnchor: [13, 34],
+    popupAnchor: [0, -32],
+  });
+}
+
+/* ============================================================
+   POPUP HTML (desktop only)
+============================================================ */
+
+function buildPopupHtml(place, key, url) {
+  let html = `<div class="popup-card">`;
+
+  html += `
+    <div class="popup-header">
+      <div class="popup-title">${place.title || ""}</div>
+      <button class="fav-btn ${isFavorite(key) ? "fav-active" : ""}" data-key="${key}">♡</button>
+      <button class="popup-share-button">⋮</button>
+    </div>
+  `;
+
+  html += `<div class="popup-region">${place.region || ""}</div>`;
+
+  if (place.category) {
+    html += `<div class="popup-category">${getCategoryEmoji(place.category)} ${place.category}</div>`;
+  }
+
+  const img = place.image_url || place.image;
+  if (img) {
+    html += `
+      <div class="popup-image-wrapper skeleton">
+        <img src="${img}" class="popup-image" 
+             onload="this.classList.remove('skeleton'); this.parentElement.classList.remove('skeleton');"/>
+      </div>
+    `;
+  }
+
+  if (place.description) {
+    html += `<div class="popup-desc">${place.description}</div>`;
+  }
+
+  html += `
+    <button class="popup-see-more popup-button">See more</button>
+    <div class="popup-more-section collapsed">
+      <div class="popup-row"><strong>Website:</strong> <a href="${place.website_url||"#"}" target="_blank">${place.website_url||"N/A"}</a></div>
+      <div class="popup-row"><strong>Cost:</strong> ${place.cost||"N/A"}</div>
+      <div class="popup-row"><strong>Parking:</strong> ${place.parking||"N/A"}</div>
+      <div class="popup-row"><strong>Municipality:</strong> ${place.municipality||"N/A"}</div>
+    </div>
+  `;
+
+  html += `
+    <div class="popup-share-menu hidden">
+      <a class="popup-share-gmaps" target="_blank" href="${url}">Open in Google Maps</a>
+      <button class="popup-share-copy">Copy link</button>
+      <button class="popup-share-native">Share…</button>
+    </div>
+  `;
+
+  
+  html += `
+    <div class="popup-share-modal hidden">
+      <div class="popup-share-modal-content">
+        <button class="popup-share-modal-close">×</button>
+        <a class="popup-share-gmaps" target="_blank" href="${url}">Open in Google Maps</a>
+        <button class="popup-share-copy">Copy link</button>
+        <button class="popup-share-native">Share…</button>
+      </div>
+    </div>
+  `;
+html += `</div>`;
+
+  return html;
+}
+
+
+/* ============================================================
+   HIGHLIGHT ANIMATION
+============================================================ */
+export function highlightMarker(marker) {
+  if (!marker || !state.map) return;
+
+  if (highlightRing) {
+    state.map.removeLayer(highlightRing);
+    highlightRing = null;
+  }
+
+  highlightRing = L.circleMarker(marker.getLatLng(), {
+    radius: 18,
+    color: "#38BDF8",
+    weight: 2,
+    fillOpacity: 0,
+    className: "marker-highlight-ring",
+  }).addTo(state.map);
+
+  setTimeout(() => {
+    if (highlightRing) {
+      state.map.removeLayer(highlightRing);
+      highlightRing = null;
+    }
+  }, 800);
+}
