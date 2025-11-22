@@ -40,8 +40,7 @@ export function initMarkers() {
   const isMobile = () => window.innerWidth <= 768;
 
   /* ============================================================
-     GLOBAL MOBILE POPUP DISABLER (NUCLEAR FIX)
-     This removes *all* Leaflet popup capability on mobile.
+     GLOBAL MOBILE POPUP DISABLER
   ============================================================ */
   if (isMobile()) {
     L.Map.prototype.openPopup = function () { return this; };
@@ -100,17 +99,14 @@ export function initMarkers() {
 
     const popupHtml = buildPopupHtml(place, key, gmapUrl);
 
-    /* Desktop popups */
     if (!isMobile()) {
       marker.bindPopup(popupHtml, { sanitize: false });
-
       marker.on("click", () => {
         highlightMarker(marker);
         marker.openPopup();
       });
     }
 
-    /* Mobile: no popups */
     if (isMobile()) {
       marker.unbindPopup();
       marker.off("popupopen");
@@ -127,7 +123,6 @@ export function initMarkers() {
       });
     }
 
-    /* Marker selection highlight */
     marker.on("click", () => {
       document
         .querySelectorAll(".marker-pin")
@@ -142,54 +137,25 @@ export function initMarkers() {
   });
 
   /* ============================================================
-     POPUP ENHANCEMENTS (FINAL / CORRECTED VERSION)
+     POPUP ENHANCEMENTS (DESKTOP ONLY)
   ============================================================ */
-
-  if (isMobile()) {
-    
-state.map.on("popupopen", (e) => {
-  setTimeout(() => {
-    const popupEl = e.popup.getElement();
-    if (!popupEl) return;
-
-    const seeMoreBtn = popupEl.querySelector(".popup-see-more");
-    const moreSection = popupEl.querySelector(".popup-more-section");
-    if (seeMoreBtn && moreSection) {
-      seeMoreBtn.onclick = (ev) => {
-        ev.stopPropagation();
-        moreSection.classList.toggle("expanded");
-        seeMoreBtn.textContent = moreSection.classList.contains("expanded")
-          ? "See less"
-          : "See more";
-      };
-    }
-  });
-});
-
-  } else {
-    /* THIS IS THE FIXED VERSION — with delayed binding */
+  if (!isMobile()) {
     state.map.on("popupopen", (e) => {
       setTimeout(() => {
         const popupEl = e.popup.getElement();
         if (!popupEl) return;
 
-        if (popupEl.dataset && popupEl.dataset.enhanced === "1") return;
-        if (popupEl.dataset) popupEl.dataset.enhanced = "1";
-
         const seeMoreBtn = popupEl.querySelector(".popup-see-more");
         const moreSection = popupEl.querySelector(".popup-more-section");
+
         if (seeMoreBtn && moreSection) {
-          seeMoreBtn.addEventListener("click", (ev) => {
+          seeMoreBtn.onclick = (ev) => {
             ev.stopPropagation();
             moreSection.classList.toggle("expanded");
             seeMoreBtn.textContent = moreSection.classList.contains("expanded")
               ? "See less"
               : "See more";
-          });
-        }
-
-        
-          });
+          };
         }
       });
     });
@@ -228,7 +194,6 @@ function buildPopupHtml(place, key, url) {
     <div class="popup-header">
       <div class="popup-title">${place.title || ""}</div>
       <button class="fav-btn ${isFavorite(key) ? "fav-active" : ""}" data-key="${key}">♡</button>
-      
     </div>
   `;
 
@@ -258,15 +223,20 @@ function buildPopupHtml(place, key, url) {
   html += `
     <button class="popup-see-more popup-button">See more</button>
     <div class="popup-more-section collapsed">
-      <div class="popup-row"><strong>Website:</strong> ${place.website_url ? `<a href="${place.website_url}" target="_blank">${place.website_url}</a>` : "N/A"}</div>
+      <div class="popup-row"><strong>Website:</strong> ${
+        place.website_url
+          ? `<a href="${place.website_url}" target="_blank">${place.website_url}</a>`
+          : "N/A"
+      }</div>
       <div class="popup-row"><strong>Cost:</strong> ${place.cost || "N/A"}</div>
-      <div class="popup-row"><strong>Parking:</strong> ${place.parking || "N/A"}</div>
-      <div class="popup-row"><strong>Municipality:</strong> ${place.municipality || "N/A"}</div>
+      <div class="popup-row"><strong>Parking:</strong> ${
+        place.parking || "N/A"
+      }</div>
+      <div class="popup-row"><strong>Municipality:</strong> ${
+        place.municipality || "N/A"
+      }</div>
     </div>
   `;
-
-  html += `
-    `;
 
   html += `</div>`;
   return html;
