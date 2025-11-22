@@ -47,7 +47,6 @@ export function initMarkers() {
     L.Map.prototype.openPopup = function () { return this; };
     L.Popup.prototype.openOn = function () { return this; };
   } else {
-    // Desktop only: set up global handler for popup favorite buttons
     initPopupFavoriteHandler();
   }
 
@@ -56,17 +55,15 @@ export function initMarkers() {
   ============================================================ */
   const clusterGroup = L.markerClusterGroup({
     showCoverageOnHover: false,
-    zoomToBoundsOnClick: !isMobile(), // disable zoom-popup on mobile
+    zoomToBoundsOnClick: !isMobile(),
     spiderfyOnEveryClick: true,
     disableClusteringAtZoom: 10,
     maxClusterRadius: 50,
   });
 
-  // MOBILE: Disable cluster popups fully
   if (isMobile()) {
     clusterGroup.off("clusterclick");
     clusterGroup.on("clusterclick", (e) => {
-      // Only spiderfy, NEVER open a popup
       e.layer.spiderfy();
       if (e.originalEvent) {
         e.originalEvent.preventDefault();
@@ -101,16 +98,10 @@ export function initMarkers() {
       place.google_url ||
       null;
 
-    /* ============================================================
-       POPUP BUILD
-    ============================================================ */
     const popupHtml = buildPopupHtml(place, key, gmapUrl);
 
-    /* ============================================================
-       DESKTOP MODE — popups work normally
-    ============================================================ */
+    /* Desktop popups */
     if (!isMobile()) {
-      // Disable sanitization so Leaflet does not strip heart / data attributes
       marker.bindPopup(popupHtml, { sanitize: false });
 
       marker.on("click", () => {
@@ -119,10 +110,7 @@ export function initMarkers() {
       });
     }
 
-    /* ============================================================
-       MOBILE MODE — NO POPUPS EVER
-       Clicking marker opens bottom sheet only.
-    ============================================================ */
+    /* Mobile: no popups */
     if (isMobile()) {
       marker.unbindPopup();
       marker.off("popupopen");
@@ -139,7 +127,7 @@ export function initMarkers() {
       });
     }
 
-    /* Marker selection highlight (both desktop + mobile) */
+    /* Marker selection highlight */
     marker.on("click", () => {
       document
         .querySelectorAll(".marker-pin")
@@ -154,14 +142,21 @@ export function initMarkers() {
   });
 
   /* ============================================================
-     LAST LINE OF DEFENSE + DESKTOP POPUP ENHANCEMENTS:
-     Mobile: kill all popups. Desktop: wire popup UI controls.
+     POPUP ENHANCEMENTS (FINAL / CORRECTED VERSION)
   ============================================================ */
+
   if (isMobile()) {
+    state.map.on("popupopen", (e) => {
+      // still disabled
+      e.popup._close();
+    });
+  } else {
+    /* THIS IS THE FIXED VERSION — with delayed binding */
     state.map.on("popupopen", (e) => {
       setTimeout(() => {
         const popupEl = e.popup.getElement();
         if (!popupEl) return;
+
         if (popupEl.dataset && popupEl.dataset.enhanced === "1") return;
         if (popupEl.dataset) popupEl.dataset.enhanced = "1";
 
@@ -191,7 +186,7 @@ export function initMarkers() {
         if (copyBtn && gmapsLink && navigator.clipboard) {
           copyBtn.addEventListener("click", async (ev) => {
             ev.stopPropagation();
-            try { await navigator.clipboard.writeText(gmapsLink.href); } catch(e){}
+            try { await navigator.clipboard.writeText(gmapsLink.href); } catch (e) {}
           });
         }
 
@@ -202,68 +197,10 @@ export function initMarkers() {
             navigator.share({
               title: popupEl.querySelector(".popup-title")?.textContent || "MapMigo",
               url: gmapsLink.href
-            }).catch(()=>{});
+            }).catch(() => {});
           });
         }
       });
-    })
-  } else {
-    state.map.on("popupopen", (e) => {
-      const popupEl = e.popup.getElement();
-      if (!popupEl) return;
-
-      // Avoid double-binding listeners
-      if (popupEl.dataset && popupEl.dataset.enhanced === "1") return;
-      if (popupEl.dataset) popupEl.dataset.enhanced = "1";
-
-      const seeMoreBtn = popupEl.querySelector(".popup-see-more");
-      const moreSection = popupEl.querySelector(".popup-more-section");
-      if (seeMoreBtn && moreSection) {
-        seeMoreBtn.addEventListener("click", (ev) => {
-          ev.stopPropagation();
-          moreSection.classList.toggle("expanded");
-          seeMoreBtn.textContent = moreSection.classList.contains("expanded")
-            ? "See less"
-            : "See more";
-        });
-      }
-
-      const shareBtn = popupEl.querySelector(".popup-share-button");
-      const shareMenu = popupEl.querySelector(".popup-share-menu");
-      if (shareBtn && shareMenu) {
-        shareBtn.addEventListener("click", (ev) => {
-          ev.stopPropagation();
-          shareMenu.classList.toggle("hidden");
-        });
-      }
-
-      const gmapsLink = popupEl.querySelector(".popup-share-gmaps");
-      const copyBtn = popupEl.querySelector(".popup-share-copy");
-      if (copyBtn && gmapsLink && navigator.clipboard) {
-        copyBtn.addEventListener("click", async (ev) => {
-          ev.stopPropagation();
-          try {
-            await navigator.clipboard.writeText(gmapsLink.href);
-          } catch (err) {
-            console.warn("Clipboard copy failed", err);
-          }
-        });
-      }
-
-      const nativeBtn = popupEl.querySelector(".popup-share-native");
-      if (nativeBtn && gmapsLink && navigator.share) {
-        nativeBtn.addEventListener("click", async (ev) => {
-          ev.stopPropagation();
-          try {
-            await navigator.share({
-              title: popupEl.querySelector(".popup-title")?.textContent || "MapMigo",
-              url: gmapsLink.href,
-            });
-          } catch (err) {
-            console.warn("Native share failed", err);
-          }
-        });
-      }
     });
   }
 
@@ -291,10 +228,8 @@ function createMarkerIcon(category) {
 }
 
 /* ============================================================
-   POPUP HTML (desktop only)
+   POPUP HTML
 ============================================================ */
-
-
 function buildPopupHtml(place, key, url) {
   let html = `<div class="popup-card">`;
 
@@ -350,8 +285,6 @@ function buildPopupHtml(place, key, url) {
   html += `</div>`;
   return html;
 }
-
-
 
 /* ============================================================
    HIGHLIGHT ANIMATION
