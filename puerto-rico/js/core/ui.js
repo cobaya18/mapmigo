@@ -365,7 +365,6 @@ function initPlaceSheet() {
 
   let currentSheetKey = null;
 
-  /* FIXED VERSION — mobile info added here */
   function showPlaceSheet(place, key, index) {
     placeSheet.classList.add("visible");
     placeSheet.classList.remove("expanded");
@@ -381,20 +380,24 @@ function initPlaceSheet() {
     }
     if (sheetDesc) sheetDesc.textContent = place.description || "";
 
-    /* >>> INSERTED MOBILE INFO BLOCK <<< */
-   const w = document.getElementById("sheetWebsite");
-const c = document.getElementById("sheetCost");
-const p = document.getElementById("sheetParking");
-const m = document.getElementById("sheetMunicipality");
+    /* NEW — Full-width Website Button */
+    const w = document.getElementById("sheetWebsite");
+    const c = document.getElementById("sheetCost");
+    const p = document.getElementById("sheetParking");
+    const m = document.getElementById("sheetMunicipality");
 
-if (w)
-  w.innerHTML = place.website_url
-    ? `<a href="${place.website_url}" target="_blank" class="popup-button popup-website">Website</a>`
-    : "N/A";
-if (c) c.textContent = place.cost || "N/A";
-if (p) p.textContent = place.parking || "N/A";
-if (m) m.textContent = place.municipality || "N/A";
-    /* >>> END INSERT <<< */
+    if (w) {
+      w.innerHTML = place.website_url
+        ? `<button class="popup-button popup-website"
+                     onclick="window.open('${place.website_url}', '_blank')">
+             Visit Website
+           </button>`
+        : "N/A";
+    }
+
+    if (c) c.textContent = place.cost || "N/A";
+    if (p) p.textContent = place.parking || "N/A";
+    if (m) m.textContent = place.municipality || "N/A";
 
     if (sheetImage) {
       if (place.image_url) {
@@ -413,6 +416,7 @@ if (m) m.textContent = place.municipality || "N/A";
       place.maps_url ||
       place.google_url ||
       null;
+
     if (sheetMapsBtn) {
       if (url) {
         sheetMapsBtn.href = url;
@@ -436,7 +440,7 @@ if (m) m.textContent = place.municipality || "N/A";
     });
   }
 
-  // Drag-to-close on mobile
+  /* Drag to close */
   let dragStartY = null;
   let currentY = null;
   let dragging = false;
