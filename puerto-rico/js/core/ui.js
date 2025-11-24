@@ -382,18 +382,18 @@ function initPlaceSheet() {
     if (sheetDesc) sheetDesc.textContent = place.description || "";
 
     /* >>> INSERTED MOBILE INFO BLOCK <<< */
-    const w = document.getElementById("sheetWebsite");
-    const c = document.getElementById("sheetCost");
-    const p = document.getElementById("sheetParking");
-    const m = document.getElementById("sheetMunicipality");
+   const w = document.getElementById("sheetWebsite");
+const c = document.getElementById("sheetCost");
+const p = document.getElementById("sheetParking");
+const m = document.getElementById("sheetMunicipality");
 
-    if (w)
-      w.innerHTML = place.website_url
-        ? `<a href="${place.website_url}" target="_blank">${place.website_url}</a>`
-        : "N/A";
-    if (c) c.textContent = place.cost || "N/A";
-    if (p) p.textContent = place.parking || "N/A";
-    if (m) m.textContent = place.municipality || "N/A";
+if (w)
+  w.innerHTML = place.website_url
+    ? `<a href="${place.website_url}" target="_blank" class="popup-button popup-website">Website</a>`
+    : "N/A";
+if (c) c.textContent = place.cost || "N/A";
+if (p) p.textContent = place.parking || "N/A";
+if (m) m.textContent = place.municipality || "N/A";
     /* >>> END INSERT <<< */
 
     if (sheetImage) {
