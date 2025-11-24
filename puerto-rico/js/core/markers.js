@@ -202,20 +202,20 @@ function buildPopupHtml(place, key, url) {
     </div>
   `;
 
-  const hasCategory = !!place.category;
-  const hasRegion = !!place.region;
-  if (hasCategory || hasRegion) {
-    const emoji = hasCategory ? getCategoryEmoji(place.category) : "";
-    const categoryText = hasCategory ? place.category : "";
-    const regionPart = hasRegion ? ` • ${place.region}` : "";
-    html += `<div class="popup-category">${emoji ? emoji + " " : ""}${categoryText}${regionPart}</div>`;
+  if (place.category || place.region) {
+    const emoji = place.category ? getCategoryEmoji(place.category) : "";
+    html += `<div class="popup-category">
+      ${emoji ? emoji + " " : ""}${place.category || ""}${
+      place.region ? " • " + place.region : ""
+    }
+    </div>`;
   }
 
   const img = place.image_url || place.image;
   if (img) {
     html += `
       <div class="popup-image-wrapper skeleton">
-        <img src="${img}" class="popup-image" 
+        <img src="${img}" class="popup-image"
              onload="this.classList.remove('skeleton'); this.parentElement.classList.remove('skeleton');" />
       </div>
     `;
@@ -225,6 +225,7 @@ function buildPopupHtml(place, key, url) {
     html += `<div class="popup-desc">${place.description}</div>`;
   }
 
+  /* Google Maps button */
   if (url) {
     html += `
       <a href="${url}" target="_blank" rel="noopener" class="popup-button popup-gmaps">
@@ -236,11 +237,21 @@ function buildPopupHtml(place, key, url) {
   html += `
     <button class="popup-see-more popup-button">See more</button>
     <div class="popup-more-section collapsed">
-      <div class="popup-row"><strong>Website:</strong> ${
-        place.website_url
-          ? `<a href="${place.website_url}" target="_blank" class="popup-button popup-website">Website</a>`
-          : "N/A"
-      }</div>
+  `;
+
+  /* NEW — full-width Website button */
+  if (place.website_url) {
+    html += `
+      <button class="popup-button popup-website"
+              onclick="window.open('${place.website_url}', '_blank')">
+        Visit Website
+      </button>
+    `;
+  } else {
+    html += `<div class="popup-row">Website: N/A</div>`;
+  }
+
+  html += `
       <div class="popup-row"><strong>Cost:</strong> ${place.cost || "N/A"}</div>
       <div class="popup-row"><strong>Parking:</strong> ${
         place.parking || "N/A"
