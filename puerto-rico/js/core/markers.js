@@ -94,12 +94,13 @@ export function initMarkers() {
     });
 
     const key = getPlaceKey(place, index);
+    const hasCoords = Number.isFinite(lat) && Number.isFinite(lng);
     const gmapUrl =
       place.google_maps_url ||
       place.map_url ||
       place.maps_url ||
       place.google_url ||
-      null;
+      (hasCoords ? `https://www.google.com/maps?q=${lat},${lng}` : null);
 
     const popupHtml = buildPopupHtml(place, key, gmapUrl);
 
@@ -224,12 +225,20 @@ function buildPopupHtml(place, key, url) {
     html += `<div class="popup-desc">${place.description}</div>`;
   }
 
+  if (url) {
+    html += `
+      <a href="${url}" target="_blank" rel="noopener" class="popup-button popup-gmaps">
+        Open in Google Maps
+      </a>
+    `;
+  }
+
   html += `
     <button class="popup-see-more popup-button">See more</button>
     <div class="popup-more-section collapsed">
       <div class="popup-row"><strong>Website:</strong> ${
         place.website_url
-          ? `<a href="${place.website_url}" target="_blank">${place.website_url}</a>`
+          ? `<a href="${place.website_url}" target="_blank" class="popup-button popup-website">Website</a>`
           : "N/A"
       }</div>
       <div class="popup-row"><strong>Cost:</strong> ${place.cost || "N/A"}</div>
