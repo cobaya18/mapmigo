@@ -229,6 +229,18 @@ if (img) {
     html += `<div class="popup-desc">${place.description}</div>`;
   }
 
+  // Open in Google Maps button (desktop)
+if (place.google_maps_url) {
+  html += `
+    <a href="${place.google_maps_url}"
+       target="_blank"
+       rel="noopener noreferrer"
+       class="popup-gmaps-button">
+       Open in Google Maps
+    </a>
+  `;
+}
+
   html += `
     <button class="popup-see-more popup-button">See more</button>
     <div class="popup-more-section collapsed">
