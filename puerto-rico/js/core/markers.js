@@ -224,11 +224,6 @@ if (img) {
     </div>
   `;
 }
-" class="popup-image" 
-             onload="this.classList.remove('skeleton'); this.parentElement.classList.remove('skeleton');" />
-      </div>
-    `;
-  }
 
   if (place.description) {
     html += `<div class="popup-desc">${place.description}</div>`;
