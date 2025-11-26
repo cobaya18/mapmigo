@@ -211,7 +211,7 @@ function buildPopupHtml(place, key, url) {
     html += `<div class="popup-category">${emoji ? emoji + " " : ""}${categoryText}${regionPart}</div>`;
   }
 
-  const img = place.image_url || place.image;
+  const img = place.image_url || place.image_credit;
   
 if (img) {
   const imageCreditText = getImageCreditText(place);
