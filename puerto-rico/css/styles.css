@@ -497,6 +497,17 @@ body {
   margin-bottom: 0.55rem;
 }
 
+.popup-gmaps-button {
+  display: inline-block;
+  margin: 10px 0;
+  padding: 8px 14px;
+  background: #2563eb;
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
 .popup-image-wrapper img {
   width: 100%;
   border-radius: 0.75rem;
