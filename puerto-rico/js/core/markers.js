@@ -231,14 +231,14 @@ if (img) {
 
   // Open in Google Maps button (desktop)
 if (place.google_maps_url) {
-  html += `
-    <a href="${place.google_maps_url}"
-       target="_blank"
-       rel="noopener noreferrer"
-       class="popup-gmaps-button">
-       Open in Google Maps
-    </a>
-  `;
+html += `
+  <a href="${place.google_maps_url}"
+     target="_blank"
+     rel="noopener noreferrer"
+     class="popup-button popup-gmaps-button">
+     Open in Google Maps
+  </a>
+`;
 }
 
   html += `
