@@ -250,12 +250,9 @@ html += `
           : "N/A"
       }</div>
       <div class="popup-row"><strong>Cost:</strong> ${place.cost || "N/A"}</div>
-      <div class="popup-row"><strong>Parking:</strong> ${
-        place.parking || "N/A"
-      }</div>
-      <div class="popup-row"><strong>Municipality:</strong> ${
-        place.municipality || "N/A"
-      }</div>
+      <div class="popup-row"><strong>Parking:</strong> ${place.parking || "N/A"}</div>
+      <div class="popup-row"><strong>Ease of Access:</strong> ${place.access || "N/A"}</div>
+      <div class="popup-row"><strong>Municipality:</strong> ${place.municipality || "N/A"}</div>
     </div>
   `;
 
