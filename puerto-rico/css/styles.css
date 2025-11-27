@@ -1168,14 +1168,16 @@ body {
 }
 
 .sidebar-ad-fixed {
-  position: sticky;
-  bottom: 0;
-  width: 100%;
-  padding: 8px 0;
-  background: var(--surface);
-  z-index: 30;
+  width: 250px !important;
+  height: 250px !important;
+  overflow: hidden;
+  margin: 0 auto; /* centers it */
 }
 
+.sidebar-ad-fixed iframe {
+  width: 250px !important;
+  height: 250px !important;
+}
 
 .image-credit {
   font-size: 10px;
