@@ -147,7 +147,7 @@ function initListView() {
 
         const catSpan = document.createElement("span");
         catSpan.className = "list-meta-category";
-        const typeLabel = place.type ? ` (${place.type})` : "";
+        const typeLabel = place.type ? ` • ${place.type}` : "";
         catSpan.textContent = category + typeLabel;
         metaEl.appendChild(catSpan);
       }
