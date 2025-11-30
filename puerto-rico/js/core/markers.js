@@ -207,7 +207,7 @@ function buildPopupHtml(place, key, url) {
   if (hasCategory || hasRegion) {
     const emoji = hasCategory ? getCategoryEmoji(place.category) : "";
     const categoryText = hasCategory ? place.category : "";
-    const typeText = place.type ? ` (${place.type})` : "";
+    const typeText = place.type ? ` • ${place.type}` : "";
     const regionPart = hasRegion ? ` • ${place.region}` : "";
     html += `<div class="popup-category">${emoji ? emoji + " " : ""}${categoryText}${typeText}${regionPart}</div>`;
   }
