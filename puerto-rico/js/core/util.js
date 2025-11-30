@@ -65,7 +65,7 @@ export function getCategoryColor(c = "") {
   if (n.includes("hike")) return "#34D399";
   if (n.includes("view")) return "#EF4444";
   if (n.includes("museum")) return "#6366F1";
-  if (n.includes("historic") || n.includes("landmark")) return "#8B5CF6";
+  if (n.includes("history") || n.includes("landmark")) return "#8B5CF6";
   if (n.includes("shop")) return "#F59E0B";
   if (n.includes("entertainment")) return "#D946EF";
   if (n.includes("tour") || n.includes("activity")) return "#2563EB";
