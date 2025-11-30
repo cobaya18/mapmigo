@@ -41,7 +41,7 @@ const categoryColorMap = {
   Entertainment: "#D946EF",
   Food: "#F97316",
   Hiking: "#34D399",
-  "Historical Landmark": "#8B5CF6",
+  "History": "#8B5CF6",
   Museum: "#6366F1",
   Nightlife: "#EC4899",
   "Park/Nature": "#22C55E",
@@ -81,7 +81,7 @@ const categoryEmojiMap = {
   Entertainment: "🎟️",
   Food: "🍽️",
   Hiking: "🥾",
-  "Historical Landmark": "🏰",
+  "History": "🏰",
   Museum: "🏛️",
   Nightlife: "🎵",
   "Park/Nature": "🌳",
@@ -104,7 +104,7 @@ export function getCategoryEmoji(c = "") {
   if (n.includes("hike")) return "🥾";
   if (n.includes("view")) return "📸";
   if (n.includes("museum")) return "🏛️";
-  if (n.includes("historic") || n.includes("landmark")) return "🏰";
+  if (n.includes("history") || n.includes("landmark")) return "🏰";
   if (n.includes("shop")) return "🛍️";
   if (n.includes("entertainment")) return "🎟️";
   if (n.includes("tour") || n.includes("activity")) return "🧭";
