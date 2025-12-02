@@ -579,9 +579,10 @@
           return url.replace(/"/g, '\\"').replace(/'/g, "\\'");
         }
 
-        function setBackground(, url, visible) {
-          .style.backgroundImage = "url('" + safeUrl(url) + "')";
-          .classList.toggle("is-visible", !!visible);
+        function setBackground(layerIndex, url, visible) {
+          const layer = layerIndex === 1 ? l1 : l2;
+layer.style.backgroundImage = "url('" + safeUrl(url) + "')";
+layer.classList.toggle("is-visible", visible);
         }
 
         // Initial state
@@ -620,6 +621,7 @@
   </script>
 </body>
 </html>
+
 
 
 
