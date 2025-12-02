@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MapMigo — Rediscover home. Explore somewhere new.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="MapMigo is your map amigo — a beautiful, clutter-free way to discover beaches, hikes, food, viewpoints, and hidden gems across Puerto Rico." />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-elevated: rgba(15,23,42,0.88);
+      --bg-soft: rgba(15,23,42,0.7);
+      --border-subtle: rgba(148,163,184,0.25);
+      --accent: #22c55e;
+      --accent-soft: rgba(34,197,94,0.16);
+      --accent-strong: #16a34a;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --muted-soft: rgba(156,163,175,0.25);
+      --danger: #ef4444;
+      --shadow-soft: 0 18px 45px rgba(15,23,42,0.85);
+      --radius-lg: 26px;
+      --radius-md: 16px;
+      --radius-pill: 999px;
+      --backdrop-blur: blur(18px);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Roboto", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0b1120 0, #020617 52%, #000 100%);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Layout */
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1.5rem 1.5rem 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 40%;
+      background: radial-gradient(circle at 25% 20%, #38bdf8 0, #2563eb 55%, #22c55e 100%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(15,23,42,0.9);
+    }
+
+    .brand-mark span {
+      font-size: 0.95rem;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.08rem;
+    }
+
+    .brand-title {
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      font-size: 1.02rem;
+    }
+
+    .brand-tagline {
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    .header-cta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .pill-link {
+      font-size: 0.8rem;
+      color: var(--muted);
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-pill);
+      background: rgba(15,23,42,0.7);
+      border: 1px solid rgba(148,163,184,0.4);
+    }
+
+    .primary-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.55rem 1.05rem;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #0b1120;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 18px 35px rgba(34,197,94,0.45);
+      transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+      white-space: nowrap;
+    }
+
+    .primary-cta span {
+      font-size: 1rem;
+    }
+
+    .primary-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 25px 45px rgba(34,197,94,0.6);
+      filter: brightness(1.04);
+    }
+
+    .primary-cta:active {
+      transform: translateY(0);
+      box-shadow: 0 14px 30px rgba(34,197,94,0.5);
+      filter: brightness(0.98);
+    }
+
+    /* Hero */
+    .hero-shell {
+      margin-top: 1.2rem;
+      border-radius: 32px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148,163,184,0.38);
+      background: radial-gradient(circle at top, rgba(15,23,42,0.98), rgba(2,6,23,0.98));
+    }
+
+    .hero {
+      position: relative;
+      min-height: 70vh;
+      padding: 2.6rem 2.4rem 2.4rem;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+      transform: scale(1.02);
+      filter: saturate(1.1);
+      z-index: 0;
+    }
+
+    .hero-bg::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left, rgba(15,23,42,0.0) 0, rgba(15,23,42,0.55) 40%, rgba(15,23,42,0.95) 85%, #020617 100%),
+        radial-gradient(circle at bottom, rgba(15,23,42,0.1) 0, rgba(15,23,42,0.85) 55%, #020617 90%);
+      pointer-events: none;
+    }
+
+    .hero-bg.is-visible {
+      opacity: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 540px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.25rem 0.8rem 0.25rem 0.3rem;
+      border-radius: var(--radius-pill);
+      background: radial-gradient(circle at left, rgba(34,197,94,0.35), rgba(15,23,42,0.9));
+      border: 1px solid rgba(34,197,94,0.35);
+      color: #bbf7d0;
+      font-size: 0.78rem;
+    }
+
+    .eyebrow-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #22c55e, #16a34a 60%, #15803d);
+      box-shadow: 0 0 0 6px rgba(34,197,94,0.25);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #022c22;
+      font-size: 0.9rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.3rem, 3.1vw + 1.9rem, 3.4rem);
+      line-height: 1.03;
+      letter-spacing: -0.03em;
+      margin: 0;
+    }
+
+    .hero h1 span {
+      color: #a5b4fc;
+    }
+
+    .hero-subtitle {
+      margin: 0;
+      max-width: 38rem;
+      font-size: 0.98rem;
+      color: var(--muted);
+    }
+
+    .hero-subtitle strong {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      align-items: center;
+    }
+
+    .hero-secondary-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.9rem;
+      border-radius: var(--radius-pill);
+      background: rgba(15,23,42,0.82);
+      border: 1px solid rgba(148,163,184,0.55);
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .hero-secondary-cta span {
+      font-size: 1rem;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+    }
+
+    .hero-meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-pill);
+      background: rgba(15,23,42,0.8);
+      border: 1px solid rgba(148,163,184,0.4);
+    }
+
+    .hero-meta-pill span {
+      font-size: 0.95rem;
+    }
+
+    /* Sections */
+    .section {
+      margin-top: 2.4rem;
+      padding: 1.8rem 2.1rem;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(15,23,42,0.96), rgba(15,23,42,0.98));
+      border: 1px solid rgba(148,163,184,0.32);
+      box-shadow: 0 16px 40px rgba(15,23,42,0.8);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .section-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .section-subtitle {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148,163,184,0.4);
+      background: rgba(15,23,42,0.9);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.15rem;
+    }
+
+    .feature-card {
+      padding: 1.15rem 1.1rem;
+      border-radius: var(--radius-md);
+      background: radial-gradient(circle at top, rgba(51,65,85,0.4), rgba(15,23,42,0.95));
+      border: 1px solid rgba(148,163,184,0.35);
+      box-shadow: 0 12px 30px rgba(15,23,42,0.8);
+    }
+
+    .feature-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.18rem;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.55);
+      margin-bottom: 0.55rem;
+    }
+
+    .feature-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .feature-body {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .section-columns {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: 2rem;
+      align-items: flex-start;
+    }
+
+    .category-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.55rem;
+    }
+
+    .category-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148,163,184,0.45);
+      background: rgba(15,23,42,0.85);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .category-pill span {
+      font-size: 0.98rem;
+    }
+
+    .mini-note {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.6rem;
+    }
+
+    .region-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    .region-card {
+      padding: 0.95rem 0.95rem 0.95rem;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148,163,184,0.4);
+      background: radial-gradient(circle at top left, rgba(34,197,94,0.12), rgba(15,23,42,0.95));
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      font-size: 0.86rem;
+    }
+
+    .region-card.muted {
+      opacity: 0.45;
+      background: radial-gradient(circle at top left, rgba(148,163,184,0.18), rgba(15,23,42,0.96));
+    }
+
+    .region-name {
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .region-pill {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .region-cta {
+      margin-top: 0.2rem;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      color: #bbf7d0;
+    }
+
+    .region-cta span {
+      font-size: 0.95rem;
+    }
+
+    footer {
+      padding: 1.7rem 1.5rem 1.8rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      border-top: 1px solid rgba(15,23,42,0.9);
+      text-align: center;
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: underline;
+      text-decoration-color: rgba(148,163,184,0.6);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    footer a:hover {
+      color: #e5e7eb;
+      text-decoration-color: #e5e7eb;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .page {
+        padding: 1.1rem 1rem 2.4rem;
+      }
+
+      header {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .brand-title {
+        font-size: 0.95rem;
+      }
+
+      .brand-tagline {
+        font-size: 0.72rem;
+      }
+
+      .header-cta {
+        gap: 0.5rem;
+      }
+
+      .pill-link {
+        display: none;
+      }
+
+      .hero-shell {
+        margin-top: 1rem;
+        border-radius: 24px;
+      }
+
+      .hero {
+        padding: 1.9rem 1.5rem 1.8rem;
+        min-height: 72vh;
+      }
+
+      .hero-content {
+        max-width: 100%;
+      }
+
+      .hero-subtitle {
+        font-size: 0.9rem;
+      }
+
+      .hero-meta {
+        gap: 0.5rem;
+      }
+
+      .hero-meta-pill {
+        font-size: 0.76rem;
+      }
+
+      .section {
+        margin-top: 1.75rem;
+        padding: 1.4rem 1.3rem 1.4rem;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .features-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .section-columns {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.4rem;
+      }
+
+      .region-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      footer {
+        padding-inline: 1rem;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .features-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .region-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="page">
+      <header>
+        <a href="/" class="brand">
+          <div class="brand-mark"><span>🗺️</span></div>
+          <div class="brand-text">
+            <div class="brand-title">MapMigo</div>
+            <div class="brand-tagline">Your map amigo for real-world exploring.</div>
+          </div>
+        </a>
+        <div class="header-cta">
+          <span class="pill-link">Built for Puerto Rico first.</span>
+          <a href="/puerto-rico/" class="primary-cta">
+            Open the map
+            <span>↗</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- Hero with dynamic background -->
+      <section class="hero-shell">
+        <div class="hero" id="hero">
+          <div class="hero-bg hero-bg-1"></div>
+          <div class="hero-bg hero-bg-2"></div>
+
+          <div class="hero-content">
+            <div class="hero-eyebrow">
+              <div class="eyebrow-dot">PR</div>
+              Hand-picked places, built by locals.
+            </div>
+
+            <h1>Rediscover home.<br /><span>Explore Puerto Rico on a smarter map.</span></h1>
+
+            <p class="hero-subtitle">
+              Skip the 20 tabs and messy reviews. MapMigo puts
+              <strong>beaches, hikes, rivers, viewpoints, food, nightlife</strong> and more
+              on a clean, fast map built to actually help you decide where to go.
+            </p>
+
+            <div class="hero-actions">
+              <a href="/puerto-rico/" class="primary-cta">
+                Explore Puerto Rico
+                <span>🧭</span>
+              </a>
+              <div class="hero-secondary-cta">
+                <span>✨</span>
+                Beaches, hikes, waterfalls, culture & more in one place.
+              </div>
+            </div>
+
+            <div class="hero-meta">
+              <div class="hero-meta-pill">
+                <span>📍</span>
+                Dozens of curated spots — no sponsored clutter.
+              </div>
+              <div class="hero-meta-pill">
+                <span>🗺️</span>
+                Map-first experience made for phone and desktop.
+              </div>
+              <div class="hero-meta-pill">
+                <span>🌙</span>
+                Works offline once loaded (PWA-ready).
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Why MapMigo -->
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Why MapMigo</div>
+            <p class="section-subtitle">
+              Built for people who actually live here — and the friends they show around.
+            </p>
+          </div>
+          <div class="pill-badge">
+            <span>⚡</span>
+            No accounts. No feeds. Just places worth going.
+          </div>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🧭</div>
+            <div class="feature-title">Map-first, not feed-first</div>
+            <div class="feature-body">
+              See everything on one clean map instead of scrolling through endless posts, reels,
+              and conflicting “top 10” lists.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🌊</div>
+            <div class="feature-title">Curated spots, not everything</div>
+            <div class="feature-body">
+              From quiet rivers to iconic viewpoints, MapMigo focuses on places that feel special —
+              not every single pin that technically exists.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📶</div>
+            <div class="feature-title">Built for roaming & road trips</div>
+            <div class="feature-body">
+              Designed to work great on the go with a fast interface, GPS support, and a layout
+              that feels at home on your phone.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categories & vibes -->
+      <section class="section">
+        <div class="section-columns">
+          <div>
+            <div class="section-header">
+              <div>
+                <div class="section-title">Pick a vibe</div>
+                <p class="section-subtitle">
+                  Start with beaches, rivers, hikes, history, city nights, or just “show me somewhere new.”
+                </p>
+              </div>
+            </div>
+
+            <div class="category-pills">
+              <div class="category-pill"><span>🏖️</span>Beach</div>
+              <div class="category-pill"><span>🥾</span>Hike/Nature</div>
+              <div class="category-pill"><span>🏞️</span>River/Waterfall</div>
+              <div class="category-pill"><span>📍</span>Interest Point</div>
+              <div class="category-pill"><span>🏛️</span>Museum</div>
+              <div class="category-pill"><span>🏰</span>History</div>
+              <div class="category-pill"><span>🌳</span>Park</div>
+              <div class="category-pill"><span>📸</span>Viewpoint</div>
+              <div class="category-pill"><span>🎟️</span>Entertainment</div>
+              <div class="category-pill"><span>🎵</span>Nightlife</div>
+              <div class="category-pill"><span>🧭</span>Tour/Activity</div>
+            </div>
+
+            <p class="mini-note">
+              All of these categories plug into the same map — filter, combine, favorite, and build your own
+              “where to take people” list over time.
+            </p>
+          </div>
+
+          <div>
+            <div class="section-header">
+              <div>
+                <div class="section-title">Made for Puerto Rico</div>
+                <p class="section-subtitle">
+                  We’re starting in Puerto Rico and carefully expanding — not copy-pasting a global POI database.
+                </p>
+              </div>
+            </div>
+
+            <div class="region-grid">
+              <div class="region-card">
+                <div class="region-name">
+                  <span>🇵🇷</span>
+                  <span>Puerto Rico</span>
+                </div>
+                <div class="region-pill">Live now — beaches, rivers, hikes, food, culture & more.</div>
+                <a href="/puerto-rico/" class="region-cta">
+                  Open Puerto Rico map
+                  <span>↗</span>
+                </a>
+              </div>
+
+              <div class="region-card muted">
+                <div class="region-name">
+                  <span>🇺🇸</span>
+                  <span>Florida</span>
+                </div>
+                <div class="region-pill">Concept & research stage.</div>
+                <div class="region-cta">
+                  Coming soon
+                </div>
+              </div>
+
+              <div class="region-card muted">
+                <div class="region-name">
+                  <span>🇩🇴</span>
+                  <span>Dominican Republic</span>
+                </div>
+                <div class="region-pill">On the roadmap — one step at a time.</div>
+                <div class="region-cta">
+                  Coming soon
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    © 2025 MapMigo. All Rights Reserved.
+    | <a href="/LICENSE">License</a>
+    | <a href="/legal/">Legal</a>
+  </footer>
+
+  <script>
+    (function () {
+      const CATEGORY_WHITELIST = [
+        "Beach",
+        "Hike/Nature",
+        "Interest Point",
+        "History",
+        "Museum",
+        "Nightlife",
+        "Park",
+        "River/Waterfall",
+        "Entertainment",
+        "Viewpoint",
+        "Tour/Activity",
+      ];
+
+      const API_URL = "https://mapmigo.mapmigo.workers.dev/places";
+      const MAX_IMAGES = 16;
+      const SLIDE_INTERVAL_MS = 8000;
+
+      function isMobileViewport() {
+        return window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
+      }
+
+      async function fetchHeroImages() {
+        try {
+          const res = await fetch(API_URL, { cache: "no-store" });
+          if (!res.ok) {
+            console.warn("Failed to fetch places for hero background:", res.status);
+            return [];
+          }
+
+          const data = await res.json();
+          if (!Array.isArray(data)) return [];
+
+          const urls = [];
+          for (const place of data) {
+            if (!place || !place.category) continue;
+            if (!CATEGORY_WHITELIST.includes(place.category)) continue;
+
+            const img = place.image_url || place.image;
+            if (typeof img === "string" && img.trim()) {
+              urls.push(img.trim());
+            }
+          }
+
+          const unique = Array.from(new Set(urls));
+          if (unique.length === 0) return [];
+
+          // Shuffle
+          for (let i = unique.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [unique[i], unique[j]] = [unique[j], unique[i]];
+          }
+
+          return unique.slice(0, MAX_IMAGES);
+        } catch (err) {
+          console.warn("Error loading hero images:", err);
+          return [];
+        }
+      }
+
+      function preloadImages(urls) {
+        urls.forEach((url) => {
+          const img = new Image();
+          img.src = url;
+        });
+      }
+
+      function initBackgroundSlideshow(urls) {
+        if (!urls || urls.length === 0) return;
+        const hero = document.getElementById("hero");
+        if (!hero) return;
+
+        const layer1 = hero.querySelector(".hero-bg-1");
+        const layer2 = hero.querySelector(".hero-bg-2");
+        if (!layer1 || !layer2) return;
+
+        preloadImages(urls);
+
+        let currentIndex = 0;
+        let showingLayer = 1;
+        const mobile = isMobileViewport();
+
+        function setBackground(layer, url, visible) {
+          layer.style.backgroundImage = "url('" + url.replace(/'/g, "\\'") + "')";
+          layer.classList.toggle("is-visible", !!visible);
+        }
+
+        setBackground(layer1, urls[0], true);
+        if (urls.length > 1) {
+          setBackground(layer2, urls[1], false);
+        }
+
+        if (mobile || urls.length < 2) {
+          return;
+        }
+
+        currentIndex = 1;
+
+        setInterval(() => {
+          const nextIndex = (currentIndex + 1) % urls.length;
+          const showLayer = showingLayer === 1 ? layer2 : layer1;
+          const hideLayer = showingLayer === 1 ? layer1 : layer2;
+
+          setBackground(showLayer, urls[nextIndex], true);
+          hideLayer.classList.remove("is-visible");
+
+          showingLayer = showingLayer === 1 ? 2 : 1;
+          currentIndex = nextIndex;
+        }, SLIDE_INTERVAL_MS);
+      }
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const urls = await fetchHeroImages();
+        if (urls && urls.length) {
+          initBackgroundSlideshow(urls);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
