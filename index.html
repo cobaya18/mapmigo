@@ -76,18 +76,13 @@
     }
 
     /* Light overlay so text stays legible */
-    .bg-layer::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      /* Soft white overlay with a hint of your bg color */
-      background: linear-gradient(
-        to bottom,
-        rgba(243, 244, 246, 0.8),
-        rgba(243, 244, 246, 0.92)
-      );
-      mix-blend-mode: lighten;
-    }
+ .bg-layer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.25); /* 25% white */
+}
+
 
     .bg-layer.is-visible {
       opacity: 1;
@@ -620,4 +615,5 @@
   </script>
 </body>
 </html>
+
 
