@@ -80,9 +80,8 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.25); /* 25% white */
+  background: rgba(255, 255, 255, 0.10); /* 10% white */
 }
-
 
     .bg-layer.is-visible {
       opacity: 1;
@@ -416,16 +415,36 @@
 
     <main>
       <section class="hero-card" aria-labelledby="hero-title">
-        <div class="hero-eyebrow">
-          <span>🇵🇷</span>
-          Built map-first for Puerto Rico.
-        </div>
+        <div class="hero-eyebrow" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+  <!-- Inline SVG from Commons Flag of Puerto Rico.svg -->
+  <svg xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 131.25 75"
+       width="18" height="12"
+       style="flex-shrink: 0; border-radius: 2px;">
+    <defs>
+      <clipPath id="clip0">
+        <path d="M 0 0.214844 L 130.503906 0.214844 L 130.503906 74.785156 L 0 74.785156 Z"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#clip0)">
+      <path fill="#ffffff" d="M0 0.214844 H130.503906 V74.785156 H0 Z"/>
+      <path fill="#ee0201" d="M0.25 0.25 H130.515625 V15.09375 H0.25 Z"/>
+      <path fill="#0050f0" d="M0 0.566406 H63.941406 V74.746094 H0 Z"/>
+      <path fill="#ee0201" d="M0.25 30.222656 H130.515625 V45.066406 H0.25 Z"/>
+      <path fill="#ee0201" d="M0.25 59.90625 H130.515625 V74.75 H0.25 Z"/>
+      <path fill="#ffffff"
+            d="M9.546875 25.234375 L33.1875 25.234375 L33.1875 47.734375 L9.546875 47.734375 Z"/>
+    </g>
+  </svg>
+
+  Built map-first for Puerto Rico.
+</div>
         <h1 id="hero-title" class="hero-title">
           Rediscover home on a cleaner map.
         </h1>
         <p class="hero-subtitle">
-          MapMigo is a map amigo for locals and visitors who are tired of tabs and feeds.
-          See <strong>beaches, hikes, rivers, viewpoints, museums, nightlife</strong> and more
+          MapMigo is a map amigo for locals and visitors who are tired of clutter, tabs, blogs, and feeds.
+          Explore <strong>beaches, hikes, rivers, viewpoints, museums, nightlife</strong> and more
           in one focused, fast map for Puerto Rico.
         </p>
 
@@ -560,29 +579,29 @@
       function initBackgroundSlideshow(urls) {
         if (!urls || urls.length === 0) return;
 
-        const layer1 = document.querySelector(".bg-layer-1");
-        const layer2 = document.querySelector(".bg-layer-2");
-        if (!layer1 || !layer2) return;
+        const 1 = document.querySelector(".bg--1");
+        const 2 = document.querySelector(".bg--2");
+        if (!1 || !2) return;
 
         preloadImages(urls);
 
         let currentIndex = 0;
-        let showingLayer = 1;
+        let showing = 1;
         const mobile = isMobileViewport();
 
         function safeUrl(url) {
           return url.replace(/"/g, '\\"').replace(/'/g, "\\'");
         }
 
-        function setBackground(layer, url, visible) {
-          layer.style.backgroundImage = "url('" + safeUrl(url) + "')";
-          layer.classList.toggle("is-visible", !!visible);
+        function setBackground(, url, visible) {
+          .style.backgroundImage = "url('" + safeUrl(url) + "')";
+          .classList.toggle("is-visible", !!visible);
         }
 
         // Initial state
-        setBackground(layer1, urls[0], true);
+        setBackground(1, urls[0], true);
         if (urls.length > 1) {
-          setBackground(layer2, urls[1], false);
+          setBackground(2, urls[1], false);
         }
 
         // On mobile or single image, just show the first and stop.
@@ -615,5 +634,6 @@
   </script>
 </body>
 </html>
+
 
 
