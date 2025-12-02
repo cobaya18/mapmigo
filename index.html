@@ -563,54 +563,55 @@
       }
 
       function initBackgroundSlideshow(urls) {
-        if (!urls || urls.length === 0) return;
+  if (!urls || urls.length === 0) return;
 
-        const l1 = document.querySelector(".bg-layer-1");
-        const l2 = document.querySelector(".bg-layer-2");
-        if (!1 || !2) return;
+  const l1 = document.querySelector(".bg-layer-1");
+  const l2 = document.querySelector(".bg-layer-2");
+  if (!l1 || !l2) return;
 
-        preloadImages(urls);
+  preloadImages(urls);
 
-        let currentIndex = 0;
-        let showing = 1;
-        const mobile = isMobileViewport();
+  let currentIndex = 0;
+  let showing = 1;
+  const mobile = isMobileViewport();
 
-        function safeUrl(url) {
-          return url.replace(/"/g, '\\"').replace(/'/g, "\\'");
-        }
+  function safeUrl(url) {
+    return url.replace(/"/g, '\\"').replace(/'/g, "\\'");
+  }
 
-        function setBackground(layerIndex, url, visible) {
-          const layer = layerIndex === 1 ? l1 : l2;
-layer.style.backgroundImage = "url('" + safeUrl(url) + "')";
-layer.classList.toggle("is-visible", visible);
-        }
+  function setBackground(layerIndex, url, visible) {
+    const layer = layerIndex === 1 ? l1 : l2;
+    layer.style.backgroundImage = "url('" + safeUrl(url) + "')";
+    layer.classList.toggle("is-visible", visible);
+  }
 
-        // Initial state
-        setBackground(1, urls[0], true);
-        if (urls.length > 1) {
-          setBackground(2, urls[1], false);
-        }
+  // Initial
+  setBackground(1, urls[0], true);
+  if (urls.length > 1) {
+    setBackground(2, urls[1], false);
+  }
 
-        // On mobile or single image, just show the first and stop.
-        if (mobile || urls.length < 2) {
-          return;
-        }
+  // Stop rotation on mobile or if <2 images
+  if (mobile || urls.length < 2) {
+    return;
+  }
 
-        currentIndex = 1;
+  currentIndex = 1;
 
-        setInterval(() => {
-          const nextIndex = (currentIndex + 1) % urls.length;
-          const showLayer = showingLayer === 1 ? layer2 : layer1;
-          const hideLayer = showingLayer === 1 ? layer1 : layer2;
+  setInterval(() => {
+    const nextIndex = (currentIndex + 1) % urls.length;
 
-          setBackground(showLayer, urls[nextIndex], true);
-          hideLayer.classList.remove("is-visible");
+    const showLayer = showing === 1 ? 2 : 1;
+    const hideLayer = showing === 1 ? 1 : 2;
 
-          showingLayer = showingLayer === 1 ? 2 : 1;
-          currentIndex = nextIndex;
-        }, SLIDE_INTERVAL_MS);
-      }
+    setBackground(showLayer, urls[nextIndex], true);
+    const hideEl = hideLayer === 1 ? l1 : l2;
+    hideEl.classList.remove("is-visible");
 
+    showing = showLayer;
+    currentIndex = nextIndex;
+  }, SLIDE_INTERVAL_MS);
+}
       document.addEventListener("DOMContentLoaded", async () => {
         const urls = await fetchHeroImages();
         if (urls && urls.length) {
@@ -621,6 +622,7 @@ layer.classList.toggle("is-visible", visible);
   </script>
 </body>
 </html>
+
 
 
 
