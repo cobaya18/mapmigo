@@ -128,14 +128,23 @@ export function initMarkers() {
       });
     }
 
-    marker.on("click", () => {
-      document
-        .querySelectorAll(".marker-pin")
-        .forEach((el) => el.classList.remove("marker-pin-selected"));
+marker.on("click", () => {
+  document
+    .querySelectorAll(".marker-pin")
+    .forEach((el) => el.classList.remove("marker-pin-selected"));
 
-      const pin = marker._icon?.querySelector(".marker-pin");
-      if (pin) pin.classList.add("marker-pin-selected");
-    });
+  const pin = marker._icon?.querySelector(".marker-pin");
+  if (pin) pin.classList.add("marker-pin-selected");
+
+  /* ============================
+     Google Analytics Event
+  ============================ */
+  gtag('event', 'marker_click', {
+    place_id: place.id,
+    name: place.title || place.name,
+    category: place.category
+  });
+});
 
     clusterGroup.addLayer(marker);
     state.markers.push(marker);
